@@ -1,7 +1,9 @@
 import { type Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
+import AnimtePlugin from "tailwindcss-animate";
 
 export default {
+    darkMode: ["class"],
     content: ["./src/**/*.tsx"],
     theme: {
         extend: {
@@ -33,5 +35,5 @@ export default {
             },
         },
     },
-    plugins: [],
+    plugins: [AnimtePlugin],
 } satisfies Config;
