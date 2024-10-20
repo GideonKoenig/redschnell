@@ -7,7 +7,6 @@ import { TRPCReactProvider } from "~/trpc/react";
 import PlausibleProvider from "next-plausible";
 import { ThemeProvider } from "~/components/control/theme-provider";
 import { cookies } from "next/headers";
-import { getServerAuthSession } from "~/server/auth";
 
 export const metadata: Metadata = {
     title: "RedSchnell",
@@ -29,9 +28,7 @@ export const metadata: Metadata = {
     },
 };
 
-export default async function RootLayout({
-    children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     const theme = cookies().get("theme");
 
     return (
