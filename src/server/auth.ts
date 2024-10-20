@@ -59,6 +59,13 @@ export const authOptions: NextAuthOptions = {
             clientSecret: env.GOOGLE_CLIENT_SECRET,
         }),
     ],
+    pages: {
+        signIn: "/auth/signin",
+        // signOut: "/auth/signout",
+        //  error: '/auth/error',
+        //  verifyRequest: '/auth/verify-request',
+        //  newUser: '/auth/new-user'
+    },
 };
 
 export const getServerAuthSession = () => getServerSession(authOptions);

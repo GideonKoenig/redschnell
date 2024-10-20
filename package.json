@@ -17,6 +17,8 @@
     "dependencies": {
         "@auth/drizzle-adapter": "^1.1.0",
         "@radix-ui/react-icons": "^1.3.0",
+        "@radix-ui/react-slot": "^1.1.0",
+        "@svgr/webpack": "^8.1.0",
         "@t3-oss/env-nextjs": "^0.10.1",
         "@tanstack/react-query": "^5.50.0",
         "@trpc/client": "^11.0.0-rc.446",
@@ -31,11 +33,14 @@
         "next-auth": "^4.24.7",
         "next-plausible": "^3.12.2",
         "next-sitemap": "^4.2.3",
+        "next-themes": "^0.3.0",
         "postgres": "^3.4.4",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
+        "react-icons": "^5.3.0",
         "server-only": "^0.0.1",
         "superjson": "^2.2.1",
+        "svgo": "^3.3.2",
         "tailwind-merge": "^2.5.4",
         "tailwindcss-animate": "^1.0.7",
         "zod": "^3.23.3"
