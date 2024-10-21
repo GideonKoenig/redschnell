@@ -8,7 +8,7 @@ export default async function Home() {
             <NavigationBar className="bg-menu-main dark:bg-dark-menu-main" />
             <div className="flex flex-grow flex-col items-center justify-center bg-menu-main text-text-normal dark:bg-dark-menu-main dark:text-dark-text-normal">
                 <div className="flex flex-col gap-10">
-                    <h1 className="text-6xl font-black drop-shadow-[0px_4px_12px_rgba(0,0,0,0.3)] dark:drop-shadow-[0px_4px_12px_rgba(255,255,255,0.3)]">
+                    <h1 className="text-6xl font-black drop-shadow-[0px_4px_12px_rgba(0,0,0,0.3)] dark:drop-shadow-[0px_4px_12px_rgba(255,255,255,0.15)]">
                         Transcriptions but{" "}
                         <span className="text-accent-main underline dark:text-dark-accent-light">
                             easy
