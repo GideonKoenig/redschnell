@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" viewBox="0 0 300 300">
+	<g fill="none" stroke="#2a2a2a" stroke-width="10">
+		<path stroke-width="11.034" d="M97.652 29.907h93.892m-3.391-1.131 54.262 41.46m-2.222-4.256v82.584m1.423-3.714L128.212 266.514" />
+		<path d="M-13.815 0h27.63" transform="matrix(1.23924 0 0 1.10335 147.647 88.438)" />
+		<path stroke-width="11.034" d="m161.637 87.555 26.218 17.986m-2.422-4.467v24.692m1.251-3.481-56.702 68.286" />
+		<path d="M0-73.218V73.218" transform="matrix(1.10335 .0045 -.00352 .86198 68.633 131.257)" />
+		<path stroke-width="11.034" d="m134.782 86.385-27.748 34.682m-5.096-93.239-34.21 43.656" />
+	</g>
+</svg>

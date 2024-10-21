@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { index, serial, timestamp, varchar } from "drizzle-orm/pg-core";
-import { users } from "~/db/auth";
+import { users } from "~/server/db/auth";
 import { createTable } from "~/server/db/utils";
 export {
     users,
@@ -9,7 +9,7 @@ export {
     sessions,
     sessionsRelations,
     verificationTokens,
-} from "~/db/auth";
+} from "~/server/db/auth";
 
 export const posts = createTable(
     "post",

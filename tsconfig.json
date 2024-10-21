@@ -28,8 +28,7 @@
         "paths": {
             "~/*": ["./src/*"],
             "~/components/*": ["./src/components/*"],
-            "~/db/*": ["./src/server/db/*"],
-            "~/api/*": ["./src/server/api/*"]
+            "~/server/*": ["./src/server/*"],
         }
     },
     "include": [
