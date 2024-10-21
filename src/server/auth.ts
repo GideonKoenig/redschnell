@@ -1,20 +1,12 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import {
-    getServerSession,
-    type DefaultSession,
-    type NextAuthOptions,
-} from "next-auth";
+import { getServerSession, type DefaultSession, type NextAuthOptions } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
 import GoogleProvider from "next-auth/providers/google";
+import GithubProvider from "next-auth/providers/github";
 
 import { env } from "~/env";
 import { db } from "~/server/db";
-import {
-    accounts,
-    sessions,
-    users,
-    verificationTokens,
-} from "~/server/db/schema";
+import { accounts, sessions, users, verificationTokens } from "~/server/db/schema";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -58,6 +50,10 @@ export const authOptions: NextAuthOptions = {
             clientId: env.GOOGLE_CLIENT_ID,
             clientSecret: env.GOOGLE_CLIENT_SECRET,
         }),
+        GithubProvider({
+            clientId: env.GITHUB_CLIENT_ID,
+            clientSecret: env.GITHUB_CLIENT_SECRET,
+        }),
     ],
     pages: {
         signIn: "/auth/signin",
@@ -66,6 +62,12 @@ export const authOptions: NextAuthOptions = {
         //  verifyRequest: '/auth/verify-request',
         //  newUser: '/auth/new-user'
     },
+};
+
+export type AuthMiddlewareResponse = {
+    data: {
+        auth: boolean;
+    };
 };
 
 export const getServerAuthSession = () => getServerSession(authOptions);

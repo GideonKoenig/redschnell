@@ -4,13 +4,13 @@ import { z } from "zod";
 export const env = createEnv({
     server: {
         DATABASE_URL: z.string().url(),
-        NODE_ENV: z
-            .enum(["development", "test", "production"])
-            .default("development"),
+        NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
         NEXTAUTH_SECRET: z.string(),
         NEXTAUTH_URL: z.string().url(),
         GOOGLE_CLIENT_ID: z.string(),
         GOOGLE_CLIENT_SECRET: z.string(),
+        GITHUB_CLIENT_ID: z.string(),
+        GITHUB_CLIENT_SECRET: z.string(),
     },
 
     client: {
@@ -24,6 +24,8 @@ export const env = createEnv({
         NEXTAUTH_URL: process.env.NEXTAUTH_URL,
         GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
         GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+        GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+        GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
