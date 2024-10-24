@@ -12,7 +12,7 @@ export async function NavigationBar(props: { className?: string }) {
     return (
         <div
             className={cn(
-                "border-menu-hover dark:border-dark-menu-hover flex w-full flex-row items-center gap-4 border-b p-2",
+                "flex w-full flex-row items-center gap-4 border-t-[6px] border-accent-light p-2 dark:border-dark-accent-light",
                 props.className,
             )}
         >
@@ -42,23 +42,14 @@ export async function NavigationBar(props: { className?: string }) {
 }
 
 function NavBarSpacer(props: { size?: number }) {
-    return (
-        <div
-            className={!props.size ? "flex-grow" : ""}
-            style={{ width: `${props.size}rem` }}
-        />
-    );
+    return <div className={!props.size ? "flex-grow" : ""} style={{ width: `${props.size}rem` }} />;
 }
 
-export function NavBarLink(props: {
-    children?: ReactNode;
-    className?: string;
-    href: string;
-}) {
+export function NavBarLink(props: { children?: ReactNode; className?: string; href: string }) {
     return (
         <Link
             className={cn(
-                "hover:bg-menu-hover dark:hover:bg-dark-menu-hover flex h-12 flex-row items-center rounded px-4",
+                "flex h-12 flex-row items-center rounded px-4 hover:bg-menu-hover dark:hover:bg-dark-menu-hover",
                 props.className,
             )}
             href={props.href}
