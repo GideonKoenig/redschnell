@@ -1,90 +1,101 @@
 import { sql } from "drizzle-orm";
-import { index, serial, timestamp, varchar } from "drizzle-orm/pg-core";
+import { index, json, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { users } from "~/server/db/auth";
 import { createTable } from "~/server/db/utils";
-export { users, accounts, accountsRelations, verificationTokens } from "~/server/db/auth";
+export {
+    users,
+    accounts,
+    accountsRelations,
+    verificationTokens,
+} from "~/server/db/auth";
 
-/**
-model Chat {
-    id        String   @id @default(cuid())
-    name      String
-    createdAt DateTime @default(now())
-    lastUsed  DateTime @default(now())
-    model     String
-    messages  String // When changing to postgres -> change to String[]
-    meeting   Meeting  @relation(fields: [meetingId], references: [id])
-    meetingId String
-
-    @@index([id])
-}
-
-model Summary {
-    id          String    @id @default(cuid())
-    createdAt   DateTime?
-    model       String?
-    summary     String?
-    status      String // When changing to postgres -> change status to Enum from String
-    meeting     Meeting   @relation(fields: [meetingId], references: [id])
-    meetingId   String    @unique
-    rawResponse String? // When changing to postgres -> change rawResponses to Json from String
-
-    @@index([id])
-}
-
-model Transcript {
-    id                   String    @id @default(cuid())
-    createdAt            DateTime?
-    model                String?
-    text                 String?
-    transcriptParagraphs String?
-    status               String // When changing to postgres -> change status to Enum from String
-    meeting              Meeting   @relation(fields: [meetingId], references: [id])
-    meetingId            String    @unique
-    rawResponse          String? // When changing to postgres -> change rawResponses to Json from String
-
-    @@index([id])
-}
-
-model Meeting {
-    id          String          @id @default(cuid())
-    name        String
-    createdAt   DateTime        @default(now())
-    url         String
-    createdBy   User            @relation(fields: [createdById], references: [id])
-    createdById String
-    user        MeetingToUser[]
-    transcript  Transcript?
-    summary     Summary?
-    chats       Chat[]
-
-    @@index([id])
-}
-
-model MeetingToUser {
-    meeting   Meeting @relation(fields: [meetingId], references: [id])
-    meetingId String
-    user      User    @relation(fields: [userId], references: [id])
-    userId    String
-
-    @@id([meetingId, userId])
-}
-*/
-
-export const posts = createTable(
-    "post",
+export const files = createTable(
+    "files",
     {
-        id: serial("id").primaryKey(),
-        name: varchar("name", { length: 256 }),
-        createdById: varchar("created_by", { length: 255 })
+        id: uuid("id").defaultRandom().primaryKey(),
+        baseId: uuid("baseId"),
+        type: varchar("type", { length: 64 }).notNull(),
+        name: varchar("name", { length: 512 }).default("").notNull(),
+        url: varchar("url", { length: 1024 }).notNull(),
+        owner: varchar("owner", { length: 255 })
             .notNull()
             .references(() => users.id),
         createdAt: timestamp("created_at", { withTimezone: true })
             .default(sql`CURRENT_TIMESTAMP`)
             .notNull(),
-        updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(() => new Date()),
     },
-    (example) => ({
-        createdByIdIdx: index("created_by_idx").on(example.createdById),
-        nameIndex: index("name_idx").on(example.name),
+    (sample) => ({
+        idIdx: index("files_id_idx").on(sample.id),
+        ownerIndex: index("files_owner_idx").on(sample.owner),
+    }),
+);
+
+export const models = createTable(
+    "models",
+    {
+        name: varchar("name", { length: 512 }).primaryKey(),
+        type: varchar("type", { length: 64 }).notNull(),
+    },
+    (sample) => ({
+        nameIdx: index("models_name_idx").on(sample.name),
+    }),
+);
+
+export const transcripts = createTable(
+    "transcripts",
+    {
+        id: uuid("id").defaultRandom().primaryKey(),
+        fileId: uuid("fileId")
+            .notNull()
+            .references(() => files.id),
+        model: varchar("name", { length: 512 })
+            .notNull()
+            .references(() => models.name),
+        transcript: json("transcript").notNull(),
+        createdAt: timestamp("created_at", { withTimezone: true })
+            .default(sql`CURRENT_TIMESTAMP`)
+            .notNull(),
+    },
+    (sample) => ({
+        fileIdIdx: index("transcripts_fileId_idx").on(sample.fileId),
+        idIndex: index("transcriptsid_idx").on(sample.id),
+    }),
+);
+
+export const chats = createTable(
+    "chats",
+    {
+        id: uuid("id").defaultRandom().primaryKey(),
+        owner: varchar("owner", { length: 255 })
+            .notNull()
+            .references(() => users.id),
+        name: varchar("name", { length: 512 }).default("").notNull(),
+        model: varchar("name", { length: 512 })
+            .notNull()
+            .references(() => models.name),
+        createdAt: timestamp("created_at", { withTimezone: true })
+            .default(sql`CURRENT_TIMESTAMP`)
+            .notNull(),
+    },
+    (sample) => ({
+        idIdx: index("chats_id_idx").on(sample.id),
+        ownerIndex: index("chats_owner_idx").on(sample.owner),
+    }),
+);
+
+export const messages = createTable(
+    "messages",
+    {
+        chatId: uuid("id")
+            .notNull()
+            .references(() => chats.id),
+        role: varchar("role", { length: 64 }).notNull(),
+        text: varchar("text").notNull(),
+        createdAt: timestamp("created_at", { withTimezone: true })
+            .default(sql`CURRENT_TIMESTAMP`)
+            .notNull(),
+    },
+    (sample) => ({
+        chatIdIdx: index("messages_chatId_idx").on(sample.chatId),
     }),
 );

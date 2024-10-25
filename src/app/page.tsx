@@ -29,14 +29,18 @@ export default async function Home() {
                                 <span className="text-3xl font-bold">
                                     Find the information you need.
                                 </span>
-                                Manage all your recorded meetings, interviews and lectures in one
-                                place.
+                                Manage all your recorded meetings, interviews
+                                and lectures in one place.
                                 <br />
-                                Use the power of AI to recall details, find connections between
-                                different sources and summarize your transcripts.
+                                Use the power of AI to recall details, find
+                                connections between different sources and
+                                summarize your transcripts.
                             </p>
                             <Link className="mx-auto mt-8" href="/app">
-                                <Button variant="accent" className="px-4 py-5 drop-shadow-none">
+                                <Button
+                                    variant="accent"
+                                    className="px-4 py-5 drop-shadow-none"
+                                >
                                     Get started now
                                 </Button>
                             </Link>
@@ -46,7 +50,9 @@ export default async function Home() {
                 <div className="relative w-full bg-menu-light px-4 py-16 dark:bg-dark-menu-light">
                     <Arch className="absolute left-0 top-0 w-full text-menu-main dark:text-dark-menu-main" />
 
-                    <p>Here you can add all the marketing talk that you want.</p>
+                    <p>
+                        Here you can add all the marketing talk that you want.
+                    </p>
                 </div>
             </ScrollArea>
         </main>

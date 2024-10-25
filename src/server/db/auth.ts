@@ -1,5 +1,12 @@
 import { relations, sql } from "drizzle-orm";
-import { index, integer, primaryKey, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+    index,
+    integer,
+    primaryKey,
+    text,
+    timestamp,
+    varchar,
+} from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 import { createTable } from "~/server/db/utils";
 
@@ -27,7 +34,9 @@ export const accounts = createTable(
         userId: varchar("user_id", { length: 255 })
             .notNull()
             .references(() => users.id),
-        type: varchar("type", { length: 255 }).$type<AdapterAccount["type"]>().notNull(),
+        type: varchar("type", { length: 255 })
+            .$type<AdapterAccount["type"]>()
+            .notNull(),
         provider: varchar("provider", { length: 255 }).notNull(),
         providerAccountId: varchar("provider_account_id", {
             length: 255,

@@ -25,6 +25,7 @@
         "@trpc/client": "11.0.0-rc.593",
         "@trpc/react-query": "11.0.0-rc.593",
         "@trpc/server": "11.0.0-rc.593",
+        "@uploadthing/react": "^7.1.0",
         "class-variance-authority": "^0.7.0",
         "clsx": "^2.1.1",
         "drizzle-orm": "^0.33.0",
@@ -44,6 +45,7 @@
         "svgo": "^3.3.2",
         "tailwind-merge": "^2.5.4",
         "tailwindcss-animate": "^1.0.7",
+        "uploadthing": "^7.2.0",
         "zod": "^3.23.8"
     },
     "devDependencies": {
