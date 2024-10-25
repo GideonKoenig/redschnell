@@ -1,4 +1,4 @@
-import { NavigationBar } from "~/components/ui/navigation-menu";
+import { NavigationBar } from "~/components/navigation-menu";
 
 export default async function Pricing() {
     return (

@@ -42,7 +42,9 @@ export function OAuthProviderButton(props: { provider: ClientSafeProvider }) {
 
     return (
         <Button
-            className={cn("flex w-60 flex-row items-center gap-4 px-6 py-6 pl-4")}
+            className={cn(
+                "flex w-60 flex-row items-center gap-4 px-6 py-6 pl-4",
+            )}
             style={{ backgroundColor: color, color: textColor }}
             onClick={() => signIn(props.provider.id, { callbackUrl })}
         >

@@ -1,9 +1,9 @@
 import Link from "next/link";
 import Icon from "assets/ear.svg";
 import DarkIcon from "assets/ear-dark.svg";
-import { ThemeToggle } from "~/components/ui/theme-toggle";
+import { ThemeToggle } from "~/components/theme-toggle";
 import { cn } from "~/components/utils";
-import { LoginButton } from "~/components/ui/login-button";
+import { LoginButton } from "~/components/login-button";
 import { getServerAuthSession } from "~/server/auth";
 import { type ReactNode } from "react";
 
@@ -42,10 +42,19 @@ export async function NavigationBar(props: { className?: string }) {
 }
 
 function NavBarSpacer(props: { size?: number }) {
-    return <div className={!props.size ? "flex-grow" : ""} style={{ width: `${props.size}rem` }} />;
+    return (
+        <div
+            className={!props.size ? "flex-grow" : ""}
+            style={{ width: `${props.size}rem` }}
+        />
+    );
 }
 
-export function NavBarLink(props: { children?: ReactNode; className?: string; href: string }) {
+export function NavBarLink(props: {
+    children?: ReactNode;
+    className?: string;
+    href: string;
+}) {
     return (
         <Link
             className={cn(
