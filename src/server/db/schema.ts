@@ -2,14 +2,7 @@ import { sql } from "drizzle-orm";
 import { index, serial, timestamp, varchar } from "drizzle-orm/pg-core";
 import { users } from "~/server/db/auth";
 import { createTable } from "~/server/db/utils";
-export {
-    users,
-    accounts,
-    accountsRelations,
-    sessions,
-    sessionsRelations,
-    verificationTokens,
-} from "~/server/db/auth";
+export { users, accounts, accountsRelations, verificationTokens } from "~/server/db/auth";
 
 /**
 model Chat {

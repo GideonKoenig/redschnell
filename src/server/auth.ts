@@ -18,15 +18,8 @@ declare module "next-auth" {
     interface Session extends DefaultSession {
         user: {
             id: string;
-            // ...other properties
-            // role: UserRole;
         } & DefaultSession["user"];
     }
-
-    // interface User {
-    //   // ...other properties
-    //   // role: UserRole;
-    // }
 }
 
 export const authOptions: NextAuthOptions = {
@@ -62,12 +55,6 @@ export const authOptions: NextAuthOptions = {
         // verifyRequest: '/auth/verify-request',
         // newUser: '/auth/new-user'
     },
-};
-
-export type AuthMiddlewareResponse = {
-    data: {
-        auth: boolean;
-    };
 };
 
 export const getServerAuthSession = () => getServerSession(authOptions);

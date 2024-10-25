@@ -1,12 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import {
-    index,
-    integer,
-    primaryKey,
-    text,
-    timestamp,
-    varchar,
-} from "drizzle-orm/pg-core";
+import { index, integer, primaryKey, text, timestamp, varchar } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 import { createTable } from "~/server/db/utils";
 
@@ -34,9 +27,7 @@ export const accounts = createTable(
         userId: varchar("user_id", { length: 255 })
             .notNull()
             .references(() => users.id),
-        type: varchar("type", { length: 255 })
-            .$type<AdapterAccount["type"]>()
-            .notNull(),
+        type: varchar("type", { length: 255 }).$type<AdapterAccount["type"]>().notNull(),
         provider: varchar("provider", { length: 255 }).notNull(),
         providerAccountId: varchar("provider_account_id", {
             length: 255,
@@ -59,29 +50,6 @@ export const accounts = createTable(
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
     user: one(users, { fields: [accounts.userId], references: [users.id] }),
-}));
-
-export const sessions = createTable(
-    "session",
-    {
-        sessionToken: varchar("session_token", { length: 255 })
-            .notNull()
-            .primaryKey(),
-        userId: varchar("user_id", { length: 255 })
-            .notNull()
-            .references(() => users.id),
-        expires: timestamp("expires", {
-            mode: "date",
-            withTimezone: true,
-        }).notNull(),
-    },
-    (session) => ({
-        userIdIdx: index("session_user_id_idx").on(session.userId),
-    }),
-);
-
-export const sessionsRelations = relations(sessions, ({ one }) => ({
-    user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
 
 export const verificationTokens = createTable(
