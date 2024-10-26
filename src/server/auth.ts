@@ -41,11 +41,11 @@ export const authOptions: NextAuthOptions = {
     secret: env.NEXTAUTH_SECRET,
     callbacks: {
         async jwt({ token, user }) {
-            if (user) token.user.id = user.id;
+            if (user) token.user = { id: user.id };
             return token;
         },
         session: ({ session, token }) => {
-            if (token) session.user.id = token.user.id;
+            if (token) session.user = { id: token.user.id };
             return session;
         },
     },
