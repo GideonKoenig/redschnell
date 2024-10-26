@@ -3,7 +3,7 @@
 import { Upload, MessageSquare, FileAudio2, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
-import { ChangeEvent, useRef } from "react";
+import { type ChangeEvent, useRef } from "react";
 import { Button } from "~/components/ui/button";
 
 export function ActionBar() {
@@ -33,17 +33,11 @@ export function ActionBar() {
                 />
                 <Upload /> Upload File
             </Button>
-            <Button
-                data-state={file ? "show" : "hide"}
-                className="data-[state=hide]:hidden"
-            >
+            <Button data-state={file ? "show" : "hide"} className="data-[state=hide]:hidden">
                 <MessageSquare />
                 New Chat
             </Button>
-            <Button
-                data-state={chat ? "show" : "hide"}
-                className="data-[state=hide]:hidden"
-            >
+            <Button data-state={chat ? "show" : "hide"} className="data-[state=hide]:hidden">
                 <FileAudio2 />
                 Go To File
             </Button>

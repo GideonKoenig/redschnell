@@ -4,7 +4,7 @@ const config = {
     parserOptions: {
         project: true,
     },
-    plugins: ["@typescript-eslint", "drizzle"],
+    plugins: ["@typescript-eslint", "drizzle", "eslint-plugin-react-compiler",],
     extends: [
         "next/core-web-vitals",
         "plugin:@typescript-eslint/recommended-type-checked",
@@ -47,6 +47,7 @@ const config = {
                 drizzleObjectName: ["db", "ctx.db"],
             },
         ],
+        "react-compiler/react-compiler": "error",
     },
     ignorePatterns: ["next.config.js"],
 };
