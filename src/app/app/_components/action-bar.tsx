@@ -3,7 +3,7 @@
 import { Upload, MessageSquare, FileAudio2, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
-import { ChangeEvent, useRef } from "react";
+import { type ChangeEvent, useRef } from "react";
 import { Button } from "~/components/ui/button";
 
 export function ActionBar() {
