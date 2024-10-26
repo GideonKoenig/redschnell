@@ -1,8 +1,9 @@
 import Icon from "assets/ear.svg";
 
-export default async function App() {
+export default async function File(props: { params: { chat: string } }) {
     return (
         <div className="flex h-full w-full select-none flex-col items-center justify-center gap-6 text-text-muted dark:text-dark-text-muted">
+            <p>Chat: {props.params.chat}</p>
             <Icon className="inline-block h-48 w-48 text-menu-hover dark:text-dark-menu-light" />
             <div className="flex flex-col items-center gap-6 rounded-lg border-[4px] border-dashed border-menu-light p-6 dark:border-dark-menu-light">
                 <p className="text-lg">

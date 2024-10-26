@@ -7,7 +7,7 @@ const sitemapConfig = {
         policies: [
             {
                 userAgent: "*",
-                disallow: [],
+                disallow: ["/app/"],
             },
         ],
     },

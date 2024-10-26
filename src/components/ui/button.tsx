@@ -9,10 +9,10 @@ const buttonVariants = cva(
         variants: {
             variant: {
                 default:
-                    "bg-menu-light text-text-normal dark:shadow-dark-menu-dark shadow shadow-menu-dark hover:bg-menu-hover dark:bg-dark-menu-light dark:text-dark-text-normal dark:hover:bg-dark-menu-hover",
+                    "bg-menu-main text-text-normal dark:shadow-dark-menu-dark shadow shadow-menu-dark hover:bg-menu-hover dark:bg-dark-menu-light dark:text-dark-text-normal dark:hover:bg-dark-menu-hover",
                 accent: "bg-accent-main text-dark-text-normal shadow shadow-menu-dark hover:bg-accent-dark dark:bg-dark-accent-main dark:text-dark-text-normal dark:shadow-dark-menu-dark dark:hover:bg-dark-accent-dark",
                 destructive:
-                    "bg-red-500 text-zinc-50 hover:bg-red-500/90 dark:bg-red-900 dark:text-zinc-50 dark:hover:bg-red-900/90",
+                    "bg-red-500 dark:shadow-dark-menu-dark shadow shadow-menu-dark text-zinc-50 hover:bg-red-500/90 dark:bg-red-900 dark:text-zinc-50 dark:hover:bg-red-900/90",
                 ghost: "hover:bg-menu-hover dark:hover:bg-dark-menu-hover",
                 link: "text-text-normal underline-offset-4 hover:underline dark:text-dark-text-normal",
             },

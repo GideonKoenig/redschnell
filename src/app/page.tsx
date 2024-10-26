@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
-import { NavigationBar } from "~/components/ui/navigation-menu";
+import { NavigationBar } from "~/components/navigation-menu";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import Arch from "assets/arch.svg";
 

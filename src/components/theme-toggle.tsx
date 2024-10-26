@@ -1,15 +1,16 @@
 "use client";
 
 import { Sun, Moon, Monitor } from "lucide-react";
-import { useTheme } from "~/components/control/theme-provider";
+import { useTheme } from "~/app/_components/theme-provider";
 import { Button } from "~/components/ui/button";
 
-export function ThemeToggle() {
+export function ThemeToggle(props: { className?: string }) {
     const { setTheme, themes, theme } = useTheme();
     return (
         <Button
             variant="ghost"
             size="icon"
+            className={props.className}
             onMouseDown={() => {
                 const nextThemeIndex =
                     (themes.findIndex((e) => e === theme()) + 1) % 3;

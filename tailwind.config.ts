@@ -22,8 +22,8 @@ export default {
                 },
                 menu: {
                     main: "rgb(255 255 255)",
-                    light: "rgb(230 232 236)",
-                    hover: "rgb(200 202 206)",
+                    light: "rgb(245 247 251)",
+                    hover: "rgb(230 232 236)",
                     dark: "rgb(120 122 126)",
                 },
                 accent: {
@@ -33,8 +33,8 @@ export default {
                 },
                 dark: {
                     text: {
-                        normal: "rgb(255 255 244)",
-                        muted: "rgb(201 194 182)",
+                        normal: "rgb(240 250 255)",
+                        muted: "rgb(175 182 187)",
                     },
                     menu: {
                         main: "rgb(33 36 37)",

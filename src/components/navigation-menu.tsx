@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Icon from "assets/ear.svg";
-import DarkIcon from "assets/ear-dark.svg";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { cn } from "~/components/utils";
 import { LoginButton } from "~/components/login-button";
@@ -17,8 +16,7 @@ export async function NavigationBar(props: { className?: string }) {
             )}
         >
             <NavBarLink href="/">
-                <Icon className="inline-block h-10 w-10 dark:hidden" />
-                <DarkIcon className="hidden h-10 w-10 dark:inline-block" />
+                <Icon className="inline-block h-10 w-10" />
                 <p>RedSchnell</p>
             </NavBarLink>
 
