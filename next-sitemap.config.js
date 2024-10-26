@@ -2,7 +2,7 @@
 const sitemapConfig = {
     siteUrl: "https://redschnell.gko.gg",
     generateRobotsTxt: true,
-    generateIndexSitemap: false,
+    generateIndexSitemap: true,
     robotsTxtOptions: {
         policies: [
             {
