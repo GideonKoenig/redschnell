@@ -1,16 +1,20 @@
-import { getProviders } from "next-auth/react";
 import { OAuthProviderButton } from "./_components/provider-button";
 import { ArrowBigLeft } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { AuthError } from "~/app/auth/signin/_components/error-box";
+import { authOptions } from "~/server/auth";
 
 export default async function AuthSignIn() {
-    const providers = await getProviders();
+    const providers = authOptions.providers;
     const ProviderButtonList = providers
-        ? Object.values(providers).map((provider, index) => (
-              <OAuthProviderButton key={index} provider={provider} />
-          ))
-        : [];
+        .filter((provider) => provider.type === "oauth")
+        .map((provider) => ({
+            name: provider.name,
+            id: provider.id,
+        }))
+        .map((provider, index) => (
+            <OAuthProviderButton key={index} provider={provider} />
+        ));
 
     return (
         <div className="flex h-full w-full flex-col items-center justify-center bg-menu-main dark:bg-dark-menu-main">
