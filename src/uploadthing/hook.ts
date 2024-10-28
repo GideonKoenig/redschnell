@@ -27,6 +27,11 @@ const useUploader = (
         if (value === 100) {
             setTimeout(() => {
                 console.log("i triggered");
+                context.setProgressList((prev) => {
+                    const newTags = { ...prev };
+                    delete newTags[tag];
+                    return newTags;
+                });
                 router.refresh();
             }, 1500);
         }
