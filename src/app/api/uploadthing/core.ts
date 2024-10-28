@@ -20,15 +20,12 @@ export const ourFileRouter = {
             return { userId: token.user.id };
         })
         .onUploadComplete(async ({ metadata, file }) => {
-            console.log("Upload complete for userId:", metadata.userId);
-            console.log("file url", file.url);
-            console.log("file.type");
-            db.insert(files).values({
+            await db.insert(files).values({
                 type: file.type,
+                name: file.name,
                 url: file.url,
                 owner: metadata.userId,
             });
-            return;
         }),
 } satisfies FileRouter;
 

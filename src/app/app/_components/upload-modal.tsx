@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useUploader } from "~/uploadthing/hook";
 
 export function UploadModal() {
     const [dragOver, setDragOver] = useState<boolean>(false);
+    const { uploadFiles } = useUploader("uploader");
 
     useEffect(() => {
         const handleDragOver = (event: DragEvent) => {
@@ -13,7 +15,8 @@ export function UploadModal() {
 
         const handleDrop = (event: DragEvent) => {
             event.preventDefault();
-            console.log(event.dataTransfer?.files);
+            const files = event.dataTransfer?.files;
+            if (files && files.length > 0) void uploadFiles(Array.from(files));
             setDragOver(false);
         };
 
@@ -33,7 +36,7 @@ export function UploadModal() {
             window.removeEventListener("dragleave", handleDragLeave);
             window.removeEventListener("drop", handleDrop);
         };
-    }, []);
+    }, [uploadFiles]);
 
     return (
         <>
