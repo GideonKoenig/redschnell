@@ -1,101 +1,84 @@
-import { sql } from "drizzle-orm";
-import { index, json, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
-import { users } from "~/server/db/auth";
+import { relations, sql } from "drizzle-orm";
+import {
+    index,
+    integer,
+    json,
+    pgEnum,
+    timestamp,
+    uuid,
+    varchar,
+} from "drizzle-orm/pg-core";
+import { user } from "~/server/db/auth";
 import { createTable } from "~/server/db/utils";
+
 export {
-    users,
-    accounts,
-    accountsRelations,
-    verificationTokens,
+    userRoleEnum,
+    user,
+    userRelations,
+    account,
+    accountRelations,
+    session,
+    sessionRelations,
+    verification,
 } from "~/server/db/auth";
 
-export const files = createTable(
-    "files",
+export const sources = createTable(
+    "source",
     {
         id: uuid("id").defaultRandom().primaryKey(),
-        baseId: uuid("baseId"),
-        type: varchar("type", { length: 64 }).notNull(),
-        name: varchar("name", { length: 512 }).default("").notNull(),
+        name: varchar("name", { length: 512 }).notNull(),
         url: varchar("url", { length: 1024 }).notNull(),
+        duration: integer("duration"),
         owner: varchar("owner", { length: 255 })
             .notNull()
-            .references(() => users.id),
+            .references(() => user.id),
         createdAt: timestamp("created_at", { withTimezone: true })
             .default(sql`CURRENT_TIMESTAMP`)
             .notNull(),
     },
-    (sample) => ({
-        idIdx: index("files_id_idx").on(sample.id),
-        ownerIndex: index("files_owner_idx").on(sample.owner),
+    (source) => ({
+        idIdx: index("source_id_idx").on(source.id),
+        ownerIdx: index("source_owner_idx").on(source.owner),
     }),
 );
 
-export const models = createTable(
-    "models",
-    {
-        name: varchar("name", { length: 512 }).primaryKey(),
-        type: varchar("type", { length: 64 }).notNull(),
-    },
-    (sample) => ({
-        nameIdx: index("models_name_idx").on(sample.name),
-    }),
-);
+export const sourcesRelations = relations(sources, ({ one }) => ({
+    owner: one(user, { fields: [sources.owner], references: [user.id] }),
+    transcript: one(transcripts),
+}));
+
+export const transcriptStatusEnum = pgEnum("transcript_status", [
+    "pending",
+    "processing",
+    "completed",
+    "failed",
+]);
 
 export const transcripts = createTable(
-    "transcripts",
+    "transcript",
     {
         id: uuid("id").defaultRandom().primaryKey(),
-        fileId: uuid("fileId")
+        sourceId: uuid("source_id")
             .notNull()
-            .references(() => files.id),
-        model: varchar("name", { length: 512 })
-            .notNull()
-            .references(() => models.name),
-        transcript: json("transcript").notNull(),
+            .unique()
+            .references(() => sources.id, { onDelete: "cascade" }),
+        status: transcriptStatusEnum("status").notNull().default("pending"),
+        content: json("content"),
+        error: varchar("error", { length: 1024 }),
         createdAt: timestamp("created_at", { withTimezone: true })
             .default(sql`CURRENT_TIMESTAMP`)
             .notNull(),
+        completedAt: timestamp("completed_at", { withTimezone: true }),
     },
-    (sample) => ({
-        fileIdIdx: index("transcripts_fileId_idx").on(sample.fileId),
-        idIndex: index("transcriptsid_idx").on(sample.id),
+    (transcript) => ({
+        idIdx: index("transcript_id_idx").on(transcript.id),
+        sourceIdIdx: index("transcript_source_id_idx").on(transcript.sourceId),
     }),
 );
 
-export const chats = createTable(
-    "chats",
-    {
-        id: uuid("id").defaultRandom().primaryKey(),
-        owner: varchar("owner", { length: 255 })
-            .notNull()
-            .references(() => users.id),
-        name: varchar("name", { length: 512 }).default("").notNull(),
-        model: varchar("name", { length: 512 })
-            .notNull()
-            .references(() => models.name),
-        createdAt: timestamp("created_at", { withTimezone: true })
-            .default(sql`CURRENT_TIMESTAMP`)
-            .notNull(),
-    },
-    (sample) => ({
-        idIdx: index("chats_id_idx").on(sample.id),
-        ownerIndex: index("chats_owner_idx").on(sample.owner),
+export const transcriptsRelations = relations(transcripts, ({ one }) => ({
+    source: one(sources, {
+        fields: [transcripts.sourceId],
+        references: [sources.id],
     }),
-);
-
-export const messages = createTable(
-    "messages",
-    {
-        chatId: uuid("id")
-            .notNull()
-            .references(() => chats.id),
-        role: varchar("role", { length: 64 }).notNull(),
-        text: varchar("text").notNull(),
-        createdAt: timestamp("created_at", { withTimezone: true })
-            .default(sql`CURRENT_TIMESTAMP`)
-            .notNull(),
-    },
-    (sample) => ({
-        chatIdIdx: index("messages_chatId_idx").on(sample.chatId),
-    }),
-);
+}));

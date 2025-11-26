@@ -1,26 +1,26 @@
-import Icon from "assets/ear.svg";
+import { AudioLines, Upload } from "lucide-react";
 
-export default async function App() {
+export default function AppHome() {
     return (
-        <div className="flex h-full w-full select-none flex-col items-center justify-center gap-6 text-text-muted dark:text-dark-text-muted">
-            <Icon className="inline-block h-48 w-48 text-menu-hover dark:text-dark-menu-light" />
-            <div className="flex flex-col items-center gap-6 rounded-lg border-[4px] border-dashed border-menu-light p-6 dark:border-dark-menu-light">
-                <p className="text-lg">
-                    <span className="font-bold text-accent-main/70 dark:text-dark-accent-light/70">
-                        Upload
-                    </span>
-                    <span>
-                        {" a file by dragging and dropping it onto the page."}
-                    </span>
+        <div className="flex h-full flex-col items-center justify-center gap-8 p-8">
+            <AudioLines className="text-border size-24" />
+
+            <div className="flex max-w-md flex-col items-center gap-4 text-center">
+                <h2 className="text-text text-2xl font-semibold">
+                    Welcome to Redschnell
+                </h2>
+                <p className="text-text-muted">
+                    Upload audio or video files to get instant transcriptions
+                    with speaker detection and timestamps.
                 </p>
-                <p>or</p>
-                <p className="text-lg">
-                    <span className="font-bold text-accent-main/70 dark:text-dark-accent-light/70">
-                        Create
-                    </span>
-                    <span>
-                        {" a new chat from one of your uploaded files."}
-                    </span>
+            </div>
+
+            <div className="border-border flex flex-col items-center gap-4 rounded-lg border-2 border-dashed p-8">
+                <Upload className="text-text-muted size-10" />
+                <p className="text-text-muted text-sm">
+                    Drag and drop files here, or use the{" "}
+                    <span className="text-accent font-medium">Upload</span>{" "}
+                    button in the sidebar
                 </p>
             </div>
         </div>

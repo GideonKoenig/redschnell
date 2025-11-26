@@ -1,8 +1,8 @@
 /** @type {import('next-sitemap').IConfig} */
-const sitemapConfig = {
+export default {
     siteUrl: "https://redschnell.gko.gg",
     generateRobotsTxt: true,
-    generateIndexSitemap: false,
+    generateIndexSitemap: true,
     robotsTxtOptions: {
         policies: [
             {
@@ -12,5 +12,3 @@ const sitemapConfig = {
         ],
     },
 };
-
-export default sitemapConfig;

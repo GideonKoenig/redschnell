@@ -1,77 +1,102 @@
-import { relations, sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
     index,
-    integer,
-    primaryKey,
     text,
     timestamp,
+    boolean,
     varchar,
+    pgEnum,
 } from "drizzle-orm/pg-core";
-import { type AdapterAccount } from "next-auth/adapters";
 import { createTable } from "~/server/db/utils";
 
-export const users = createTable("user", {
-    id: varchar("id", { length: 255 })
-        .notNull()
-        .primaryKey()
-        .$defaultFn(() => crypto.randomUUID()),
-    name: varchar("name", { length: 255 }),
-    email: varchar("email", { length: 255 }).notNull(),
-    emailVerified: timestamp("email_verified", {
-        mode: "date",
-        withTimezone: true,
-    }).default(sql`CURRENT_TIMESTAMP`),
-    image: varchar("image", { length: 255 }),
-});
+export const userRoleEnum = pgEnum("user_role", ["free", "paid", "admin"]);
 
-export const usersRelations = relations(users, ({ many }) => ({
-    accounts: many(accounts),
-}));
-
-export const accounts = createTable(
-    "account",
+export const user = createTable(
+    "user",
     {
-        userId: varchar("user_id", { length: 255 })
-            .notNull()
-            .references(() => users.id),
-        type: varchar("type", { length: 255 })
-            .$type<AdapterAccount["type"]>()
-            .notNull(),
-        provider: varchar("provider", { length: 255 }).notNull(),
-        providerAccountId: varchar("provider_account_id", {
-            length: 255,
-        }).notNull(),
-        refresh_token: text("refresh_token"),
-        access_token: text("access_token"),
-        expires_at: integer("expires_at"),
-        token_type: varchar("token_type", { length: 255 }),
-        scope: varchar("scope", { length: 255 }),
-        id_token: text("id_token"),
-        session_state: varchar("session_state", { length: 255 }),
+        id: varchar("id", { length: 255 }).notNull().primaryKey(),
+        name: varchar("name", { length: 255 }),
+        email: varchar("email", { length: 255 }).notNull().unique(),
+        emailVerified: boolean("email_verified").notNull().default(false),
+        image: varchar("image", { length: 255 }),
+        role: userRoleEnum("role").notNull().default("free"),
+        autoTranscribe: boolean("auto_transcribe").notNull().default(false),
+        createdAt: timestamp("created_at").notNull().defaultNow(),
+        updatedAt: timestamp("updated_at").notNull().defaultNow(),
     },
-    (account) => ({
-        compoundKey: primaryKey({
-            columns: [account.provider, account.providerAccountId],
-        }),
-        userIdIdx: index("account_user_id_idx").on(account.userId),
+    (u) => ({
+        emailIdx: index("user_email_idx").on(u.email),
     }),
 );
 
-export const accountsRelations = relations(accounts, ({ one }) => ({
-    user: one(users, { fields: [accounts.userId], references: [users.id] }),
+export const userRelations = relations(user, ({ many }) => ({
+    sessions: many(session),
+    accounts: many(account),
 }));
 
-export const verificationTokens = createTable(
-    "verification_token",
+export const session = createTable(
+    "session",
     {
-        identifier: varchar("identifier", { length: 255 }).notNull(),
-        token: varchar("token", { length: 255 }).notNull(),
-        expires: timestamp("expires", {
-            mode: "date",
-            withTimezone: true,
-        }).notNull(),
+        id: varchar("id", { length: 255 }).notNull().primaryKey(),
+        userId: varchar("user_id", { length: 255 })
+            .notNull()
+            .references(() => user.id),
+        token: varchar("token", { length: 255 }).notNull().unique(),
+        expiresAt: timestamp("expires_at").notNull(),
+        ipAddress: text("ip_address"),
+        userAgent: text("user_agent"),
+        createdAt: timestamp("created_at").notNull().defaultNow(),
+        updatedAt: timestamp("updated_at").notNull().defaultNow(),
     },
-    (vt) => ({
-        compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
+    (s) => ({
+        userIdIdx: index("session_user_id_idx").on(s.userId),
+        tokenIdx: index("session_token_idx").on(s.token),
+    }),
+);
+
+export const sessionRelations = relations(session, ({ one }) => ({
+    user: one(user, { fields: [session.userId], references: [user.id] }),
+}));
+
+export const account = createTable(
+    "account",
+    {
+        id: varchar("id", { length: 255 }).notNull().primaryKey(),
+        userId: varchar("user_id", { length: 255 })
+            .notNull()
+            .references(() => user.id),
+        accountId: varchar("account_id", { length: 255 }).notNull(),
+        providerId: varchar("provider_id", { length: 255 }).notNull(),
+        accessToken: text("access_token"),
+        refreshToken: text("refresh_token"),
+        accessTokenExpiresAt: timestamp("access_token_expires_at"),
+        refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+        scope: text("scope"),
+        idToken: text("id_token"),
+        password: text("password"),
+        createdAt: timestamp("created_at").notNull().defaultNow(),
+        updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    },
+    (a) => ({
+        userIdIdx: index("account_user_id_idx").on(a.userId),
+    }),
+);
+
+export const accountRelations = relations(account, ({ one }) => ({
+    user: one(user, { fields: [account.userId], references: [user.id] }),
+}));
+
+export const verification = createTable(
+    "verification",
+    {
+        id: varchar("id", { length: 255 }).notNull().primaryKey(),
+        identifier: varchar("identifier", { length: 255 }).notNull(),
+        value: varchar("value", { length: 255 }).notNull(),
+        expiresAt: timestamp("expires_at").notNull(),
+        createdAt: timestamp("created_at").notNull().defaultNow(),
+        updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    },
+    (v) => ({
+        identifierIdx: index("verification_identifier_idx").on(v.identifier),
     }),
 );

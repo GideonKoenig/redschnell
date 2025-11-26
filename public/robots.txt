@@ -3,3 +3,6 @@ User-agent: *
 
 # Host
 Host: https://redschnell.gko.gg
+
+# Sitemaps
+Sitemap: https://redschnell.gko.gg/sitemap.xml

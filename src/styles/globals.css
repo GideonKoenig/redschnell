@@ -1,8 +1,24 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@layer base {
-    :root {
-        --radius: 0.5rem;
-    }
+@import "tailwindcss";
+
+@theme {
+    --font-sans: "Geist Sans", system-ui, sans-serif;
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+
+    --color-bg-base: #fafaf9;
+    --color-bg-surface: #ffffff;
+    --color-bg-muted: #f5f5f4;
+
+    --color-text: #1c1917;
+    --color-text-muted: #78716c;
+
+    --color-accent: #2563eb;
+    --color-accent-hover: #1d4ed8;
+
+    --color-success: #16a34a;
+    --color-error: #dc2626;
+    --color-warning: #d97706;
+
+    --color-border: #e7e5e4;
 }
