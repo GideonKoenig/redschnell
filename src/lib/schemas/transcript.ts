@@ -1,8 +1,9 @@
 import { z } from "zod";
 
 export const WhisperChunkSchema = z.object({
-    timestamp: z.tuple([z.number(), z.number()]),
+    timestamp: z.tuple([z.number(), z.number().nullable()]),
     text: z.string(),
+    speaker: z.string().nullish(),
 });
 
 export const WhisperResponseSchema = z.object({
@@ -34,15 +35,50 @@ export function whisperToTranscript(whisper: WhisperResponse): Transcript {
         (chunk, index) => ({
             id: `segment-${index}`,
             start: chunk.timestamp[0],
-            end: chunk.timestamp[1],
+            end: chunk.timestamp[1] ?? chunk.timestamp[0],
             text: chunk.text.trim(),
-            speaker: null,
+            speaker: chunk.speaker ?? null,
         }),
     );
 
     return {
         segments,
         fullText: whisper.text,
+    };
+}
+
+export function collapseConsecutiveSpeakers(
+    transcript: Transcript,
+): Transcript {
+    if (transcript.segments.length === 0) {
+        return transcript;
+    }
+
+    const collapsed: TranscriptSegment[] = [];
+    let current = { ...transcript.segments[0]! };
+
+    for (let i = 1; i < transcript.segments.length; i++) {
+        const segment = transcript.segments[i]!;
+        const sameSpeaker =
+            segment.speaker === null || current.speaker === segment.speaker;
+
+        if (sameSpeaker) {
+            current = {
+                ...current,
+                end: segment.end,
+                text: `${current.text} ${segment.text}`,
+            };
+        } else {
+            collapsed.push(current);
+            current = { ...segment };
+        }
+    }
+
+    collapsed.push(current);
+
+    return {
+        segments: collapsed,
+        fullText: transcript.fullText,
     };
 }
 

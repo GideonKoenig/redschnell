@@ -64,6 +64,7 @@ export const transcripts = createTable(
             .references(() => sources.id, { onDelete: "cascade" }),
         status: transcriptStatusEnum("status").notNull().default("pending"),
         content: json("content"),
+        processedContent: json("processed_content"),
         error: varchar("error", { length: 1024 }),
         createdAt: timestamp("created_at", { withTimezone: true })
             .default(sql`CURRENT_TIMESTAMP`)

@@ -13,6 +13,7 @@ export async function transcribeAudio(audioUrl: string) {
                 audio_url: audioUrl,
                 task: "transcribe",
                 chunk_level: "segment",
+                diarize: true,
             },
         }),
     );

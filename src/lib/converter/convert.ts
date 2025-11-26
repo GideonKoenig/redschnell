@@ -1,5 +1,5 @@
 import { fetchFile } from "@ffmpeg/util";
-import { getFFmpeg } from "~/lib/converter/ffmpeg";
+import { getFFmpeg, queueConversion } from "~/lib/converter/ffmpeg";
 import {
     tryCatch,
     newError,
@@ -9,7 +9,18 @@ import {
     type Result,
 } from "~/lib/try-catch";
 
+export { cancelConversion } from "~/lib/converter/ffmpeg";
+
 export async function convertAudio(
+    id: string,
+    file: File,
+    onProgress?: (progress: number) => void,
+    onStart?: () => void,
+): Promise<Result<File>> {
+    return queueConversion(id, () => doConvert(file, onProgress), onStart);
+}
+
+async function doConvert(
     file: File,
     onProgress?: (progress: number) => void,
 ): Promise<Result<File>> {
@@ -25,8 +36,8 @@ export async function convertAudio(
     }
     const ffmpeg = ffmpegResult.data;
 
-    const inputName = "input" + getExtension(file.name);
-    const outputName = "output.mp3";
+    const inputName = `input${getExtension(file.name)}`;
+    const outputName = `output.mp3`;
 
     const progressHandler = ({ progress }: { progress: number }) => {
         onProgress?.(Math.round(progress * 100));

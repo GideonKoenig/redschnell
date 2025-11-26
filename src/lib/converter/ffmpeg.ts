@@ -1,4 +1,5 @@
 import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { tryCatch } from "~/lib/try-catch";
 
 let ffmpeg: FFmpeg | null = null;
 let loadPromise: Promise<FFmpeg> | null = null;
@@ -25,4 +26,73 @@ export async function getFFmpeg() {
 
 export function isFFmpegLoaded() {
     return ffmpeg?.loaded ?? false;
+}
+
+type QueueItem<T> = {
+    id: string;
+    task: () => Promise<T>;
+    resolve: (value: T) => void;
+    reject: (error: unknown) => void;
+    onStart?: () => void;
+};
+
+const queue: QueueItem<unknown>[] = [];
+let isProcessing = false;
+const cancelledIds = new Set<string>();
+
+async function processQueue() {
+    if (isProcessing || queue.length === 0) return;
+
+    isProcessing = true;
+    const item = queue.shift()!;
+
+    if (cancelledIds.has(item.id)) {
+        cancelledIds.delete(item.id);
+        item.reject(new Error("Cancelled"));
+        isProcessing = false;
+        processQueue();
+        return;
+    }
+
+    item.onStart?.();
+
+    const result = await tryCatch(item.task());
+    if (cancelledIds.has(item.id)) {
+        cancelledIds.delete(item.id);
+        item.reject(new Error("Cancelled"));
+    } else if (result.success) {
+        item.resolve(result.data);
+    } else {
+        item.reject(result.error);
+    }
+
+    isProcessing = false;
+    processQueue();
+}
+
+export function queueConversion<T>(
+    id: string,
+    task: () => Promise<T>,
+    onStart?: () => void,
+): Promise<T> {
+    return new Promise((resolve, reject) => {
+        queue.push({
+            id,
+            task,
+            resolve,
+            reject,
+            onStart,
+        } as QueueItem<unknown>);
+        processQueue();
+    });
+}
+
+export function cancelConversion(id: string) {
+    const index = queue.findIndex((item) => item.id === id);
+    if (index !== -1) {
+        const item = queue.splice(index, 1)[0]!;
+        item.reject(new Error("Cancelled"));
+    } else {
+        cancelledIds.add(id);
+    }
 }

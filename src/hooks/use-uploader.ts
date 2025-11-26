@@ -1,8 +1,9 @@
 import { generateReactHelpers } from "@uploadthing/react";
+import { useRef } from "react";
 import { toast } from "sonner";
 import type { OurFileRouter } from "~/app/api/uploadthing/core";
 import { useUploadProgress } from "~/components/providers/upload-progress-provider";
-import { convertAudio } from "~/lib/converter";
+import { cancelConversion, convertAudio } from "~/lib/converter/convert";
 import { newError, tryCatch } from "~/lib/try-catch";
 import { api } from "~/trpc/react";
 
@@ -11,6 +12,7 @@ const { uploadFiles: uploadFilesUT } = generateReactHelpers<OurFileRouter>();
 export function useUploader() {
     const { addUpload, updateUpload, dismissUpload } = useUploadProgress();
     const utils = api.useUtils();
+    const abortControllers = useRef(new Map<string, AbortController>());
 
     const uploadFiles = async (files: File[]) => {
         const uploads = files.map((file) => ({
@@ -24,15 +26,32 @@ export function useUploader() {
         }
     };
 
-    const processAndUpload = async (id: string, file: File) => {
-        updateUpload(id, { phase: "converting", progress: 0 });
+    const cancelUpload = (id: string) => {
+        cancelConversion(id);
+        const controller = abortControllers.current.get(id);
+        if (controller) {
+            controller.abort();
+            abortControllers.current.delete(id);
+        }
+        dismissUpload(id);
+    };
 
-        const convertResult = await convertAudio(file, (progress) => {
-            updateUpload(id, { phase: "converting", progress });
-        });
+    const processAndUpload = async (id: string, file: File) => {
+        const convertResult = await convertAudio(
+            id,
+            file,
+            (progress) => {
+                updateUpload(id, { progress });
+            },
+            () => {
+                updateUpload(id, { phase: "converting", progress: 0 });
+            },
+        );
 
         if (!convertResult.success) {
             const error = newError(convertResult.error);
+            if (error.message === "Cancelled") return;
+
             updateUpload(id, { phase: "error", error: error.message });
             toast.error(`Failed to convert ${file.name}: ${error.message}`);
             return;
@@ -40,17 +59,29 @@ export function useUploader() {
 
         updateUpload(id, { phase: "uploading", progress: 0 });
 
+        const controller = new AbortController();
+        abortControllers.current.set(id, controller);
+
         const uploadResult = await tryCatch(
             uploadFilesUT("uploader", {
                 files: [convertResult.data],
+                signal: controller.signal,
                 onUploadProgress: ({ progress }) => {
                     updateUpload(id, { phase: "uploading", progress });
                 },
             }),
         );
 
+        abortControllers.current.delete(id);
+
         if (!uploadResult.success) {
             const error = newError(uploadResult.error);
+            if (
+                error.message.includes("abort") ||
+                error.message === "Cancelled"
+            ) {
+                return;
+            }
             updateUpload(id, { phase: "error", error: error.message });
             toast.error(`Failed to upload ${file.name}: ${error.message}`);
             return;
@@ -71,5 +102,5 @@ export function useUploader() {
         toast.error(`Failed to upload ${file.name}: No result returned`);
     };
 
-    return { uploadFiles };
+    return { uploadFiles, cancelUpload };
 }

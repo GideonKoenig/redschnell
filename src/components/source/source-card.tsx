@@ -54,7 +54,7 @@ export function SourceCard(props: { source: SourceWithTranscript }) {
             setTimeout(() => {
                 utils.sources.list.invalidate();
                 utils.sources.get.invalidate({ id: props.source.id });
-            }, 1000);
+            }, 2000);
         }
     };
 

@@ -9,7 +9,7 @@ import { useUploader } from "~/hooks/use-uploader";
 export function AppShell(props: { children: ReactNode }) {
     const { isDragging, onDragEnter, onDragLeave, onDragOver, onDrop } =
         useDropZone();
-    const { uploadFiles } = useUploader();
+    const { uploadFiles, cancelUpload } = useUploader();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleDrop = (e: React.DragEvent) => {
@@ -47,7 +47,10 @@ export function AppShell(props: { children: ReactNode }) {
                 onChange={handleFileSelect}
             />
 
-            <Sidebar onUploadClick={openFilePicker} />
+            <Sidebar
+                onUploadClick={openFilePicker}
+                onCancelUpload={cancelUpload}
+            />
 
             <main className="bg-bg-surface border-border relative h-full overflow-hidden rounded-lg border shadow-sm">
                 {props.children}

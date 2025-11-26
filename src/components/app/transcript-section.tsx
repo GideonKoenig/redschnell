@@ -7,13 +7,14 @@ import { type Transcript } from "~/lib/types";
 
 export function TranscriptSection(props: {
     transcript: Transcript | undefined;
+    sourceId: string;
     isLoading: boolean;
     onRetry: () => void;
     isRetrying: boolean;
 }) {
     if (props.isLoading) {
         return (
-            <div className="flex items-center gap-2">
+            <div className="flex w-full items-center justify-center gap-2 p-4">
                 <Loader2 className="text-accent size-5 animate-spin" />
                 <span className="text-text-muted">Loading transcript...</span>
             </div>
@@ -22,7 +23,7 @@ export function TranscriptSection(props: {
 
     if (!props.transcript) {
         return (
-            <div className="text-text-muted">
+            <div className="text-text-muted flex w-full items-center justify-center p-4">
                 <p>No transcript available.</p>
             </div>
         );
@@ -30,7 +31,7 @@ export function TranscriptSection(props: {
 
     if (props.transcript.status === "processing") {
         return (
-            <div className="flex items-center gap-3">
+            <div className="flex w-full items-center justify-center gap-3 p-4">
                 <Loader2 className="text-accent size-5 animate-spin" />
                 <span className="text-text-muted">Transcribing audio...</span>
             </div>
@@ -62,7 +63,14 @@ export function TranscriptSection(props: {
     }
 
     if (props.transcript.status === "completed") {
-        return <TranscriptView content={props.transcript.content} />;
+        return (
+            <TranscriptView
+                content={props.transcript.processedContent}
+                sourceId={props.sourceId}
+                onRetry={props.onRetry}
+                isRetrying={props.isRetrying}
+            />
+        );
     }
 
     return null;

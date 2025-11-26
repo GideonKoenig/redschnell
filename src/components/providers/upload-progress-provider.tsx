@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, type ReactNode } from "react";
 
-export type UploadPhase = "converting" | "uploading" | "success" | "error";
+export type UploadPhase = "queued" | "converting" | "uploading" | "error";
 
 export type UploadItem = {
     id: string;
@@ -10,7 +10,6 @@ export type UploadItem = {
     phase: UploadPhase;
     progress: number;
     error?: string;
-    sourceId?: string;
 };
 
 type UploadProgressContextValue = {
@@ -21,8 +20,6 @@ type UploadProgressContextValue = {
         update: Partial<Omit<UploadItem, "id" | "fileName">>,
     ) => void;
     dismissUpload: (id: string) => void;
-    getActiveUploads: () => UploadItem[];
-    getCompletedUploads: () => UploadItem[];
 };
 
 const UploadProgressContext = createContext<UploadProgressContextValue | null>(
@@ -48,7 +45,7 @@ export function UploadProgressProvider(props: { children: ReactNode }) {
             [id]: {
                 id,
                 fileName,
-                phase: "converting",
+                phase: "queued",
                 progress: 0,
             },
         }));
@@ -76,18 +73,6 @@ export function UploadProgressProvider(props: { children: ReactNode }) {
         });
     };
 
-    const getActiveUploads = () => {
-        return Object.values(uploads).filter(
-            (u) => u.phase === "converting" || u.phase === "uploading",
-        );
-    };
-
-    const getCompletedUploads = () => {
-        return Object.values(uploads).filter(
-            (u) => u.phase === "success" || u.phase === "error",
-        );
-    };
-
     return (
         <UploadProgressContext.Provider
             value={{
@@ -95,8 +80,6 @@ export function UploadProgressProvider(props: { children: ReactNode }) {
                 addUpload,
                 updateUpload,
                 dismissUpload,
-                getActiveUploads,
-                getCompletedUploads,
             }}
         >
             {props.children}

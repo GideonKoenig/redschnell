@@ -95,7 +95,7 @@ export default function SourcePage() {
     // 5. Return
     return (
         <div className="flex h-full flex-col">
-            <header className="border-border flex h-14 items-center gap-3 border-b px-4">
+            <header className="border-border flex items-center gap-3 border-b p-4">
                 <InlineEdit
                     ref={inlineEditRef}
                     value={source.name}
@@ -113,9 +113,10 @@ export default function SourcePage() {
                 </Button>
             </header>
 
-            <div className="flex-1 overflow-auto p-4">
+            <div className="min-h-0 grow">
                 <TranscriptSection
                     transcript={transcript}
+                    sourceId={sourceId}
                     isLoading={transcriptLoading}
                     onRetry={handleRetry}
                     isRetrying={retryMutation.isPending}
