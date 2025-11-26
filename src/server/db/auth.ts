@@ -7,6 +7,7 @@ import {
     varchar,
     pgEnum,
 } from "drizzle-orm/pg-core";
+import { DEFAULT_MODEL } from "~/lib/transcription-models";
 import { createTable } from "~/server/db/utils";
 
 export const userRoleEnum = pgEnum("user_role", ["free", "paid", "admin"]);
@@ -21,6 +22,9 @@ export const user = createTable(
         image: varchar("image", { length: 255 }),
         role: userRoleEnum("role").notNull().default("free"),
         autoTranscribe: boolean("auto_transcribe").notNull().default(false),
+        transcriptionModel: varchar("transcription_model", { length: 64 })
+            .notNull()
+            .default(DEFAULT_MODEL),
         createdAt: timestamp("created_at").notNull().defaultNow(),
         updatedAt: timestamp("updated_at").notNull().defaultNow(),
     },

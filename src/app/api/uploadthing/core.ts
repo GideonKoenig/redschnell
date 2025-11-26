@@ -1,10 +1,13 @@
-import { eq } from "drizzle-orm";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
 import { getSession } from "~/lib/auth-server";
+import {
+    DEFAULT_MODEL,
+    transcriptionModelSchema,
+} from "~/lib/transcription-models";
 import { processTranscription } from "~/server/api/routers/transcripts";
 import { db } from "~/server/db";
-import { sources, transcripts, user } from "~/server/db/schema";
+import { sources, transcripts } from "~/server/db/schema";
 
 const f = createUploadthing();
 
@@ -15,7 +18,11 @@ export const ourFileRouter = {
         .middleware(async () => {
             const session = await getSession();
             if (!session) throw new UploadThingError("Unauthorized") as Error;
-            return { userId: session.user.id };
+            return {
+                userId: session.user.id,
+                autoTranscribe: session.user.autoTranscribe,
+                transcriptionModel: session.user.transcriptionModel,
+            };
         })
         .onUploadComplete(async ({ metadata, file }) => {
             const [source] = await db
@@ -29,17 +36,17 @@ export const ourFileRouter = {
 
             if (!source) return { sourceId: undefined };
 
-            const userData = await db.query.user.findFirst({
-                where: eq(user.id, metadata.userId),
-                columns: { autoTranscribe: true },
-            });
-
-            if (userData?.autoTranscribe) {
+            if (metadata.autoTranscribe) {
+                const parsed = transcriptionModelSchema.safeParse(
+                    metadata.transcriptionModel,
+                );
+                const model = parsed.success ? parsed.data : DEFAULT_MODEL;
                 await db.insert(transcripts).values({
                     sourceId: source.id,
                     status: "processing",
+                    model,
                 });
-                void processTranscription(db, source.id, file.url);
+                void processTranscription(db, source.id, file.url, model);
             }
 
             return { sourceId: source.id };

@@ -67,6 +67,7 @@ export function TranscriptSection(props: {
             <TranscriptView
                 content={props.transcript.processedContent}
                 sourceId={props.sourceId}
+                model={props.transcript.model}
                 onRetry={props.onRetry}
                 isRetrying={props.isRetrying}
             />

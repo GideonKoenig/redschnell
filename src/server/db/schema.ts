@@ -54,6 +54,11 @@ export const transcriptStatusEnum = pgEnum("transcript_status", [
     "failed",
 ]);
 
+export const transcriptionModelEnum = pgEnum("transcription_model", [
+    "fal-ai/whisper",
+    "fal-ai/wizper",
+]);
+
 export const transcripts = createTable(
     "transcript",
     {
@@ -63,6 +68,7 @@ export const transcripts = createTable(
             .unique()
             .references(() => sources.id, { onDelete: "cascade" }),
         status: transcriptStatusEnum("status").notNull().default("pending"),
+        model: transcriptionModelEnum("model").notNull(),
         content: json("content"),
         processedContent: json("processed_content"),
         error: varchar("error", { length: 1024 }),

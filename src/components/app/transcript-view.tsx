@@ -11,11 +11,16 @@ import {
     type Transcript,
     type TranscriptSegment,
 } from "~/lib/schemas/transcript";
+import {
+    TRANSCRIPTION_MODELS,
+    TranscriptionModel,
+} from "~/lib/transcription-models";
 import { api } from "~/trpc/react";
 
 export function TranscriptView(props: {
     content: unknown;
     sourceId: string;
+    model: TranscriptionModel;
     onRetry: () => void;
     isRetrying: boolean;
 }) {
@@ -133,6 +138,13 @@ export function TranscriptView(props: {
                         ))}
                     </div>
                 </ScrollArea>
+            </div>
+
+            <div className="text-text-muted border-border mt-1 shrink-0 border-t px-3 py-2 text-xs">
+                Transcription provided by{" "}
+                <span className="text-text font-medium">
+                    {TRANSCRIPTION_MODELS[props.model].label}
+                </span>
             </div>
         </div>
     );

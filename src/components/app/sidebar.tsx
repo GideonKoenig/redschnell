@@ -6,7 +6,19 @@ import { SourceCard } from "~/components/source/source-card";
 import { UploadItemCard } from "~/components/source/upload-item-card";
 import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "~/components/ui/select";
 import { Switch } from "~/components/ui/switch";
+import {
+    DEFAULT_MODEL,
+    TRANSCRIPTION_MODELS,
+    type TranscriptionModel,
+} from "~/lib/transcription-models";
 import { api } from "~/trpc/react";
 
 export function Sidebar(props: {
@@ -43,6 +55,12 @@ export function Sidebar(props: {
 
     const handleAutoTranscribeChange = (checked: boolean) => {
         updateSettings.mutate({ autoTranscribe: checked });
+    };
+
+    const handleModelChange = (value: string) => {
+        updateSettings.mutate({
+            transcriptionModel: value as TranscriptionModel,
+        });
     };
 
     return (
@@ -87,23 +105,60 @@ export function Sidebar(props: {
                 </div>
             </ScrollArea>
 
-            <div className="border-border flex items-center justify-between border-t px-3 py-2">
-                <label
-                    htmlFor="auto-transcribe"
-                    className="text-text-muted flex cursor-pointer items-center gap-2 text-sm"
-                >
-                    <Settings className="size-4" />
-                    Auto transcribe
-                </label>
+            <div className="border-border flex flex-col gap-2 border-t px-3 py-2">
                 <div className="flex items-center gap-2">
+                    <Settings className="text-text-muted size-4" />
+                    <span className="text-text-muted text-sm font-medium">
+                        Settings
+                    </span>
                     {updateSettings.isPending && (
-                        <Loader2 className="text-text-muted size-3.5 animate-spin" />
+                        <Loader2 className="text-text-muted ml-auto size-3.5 animate-spin" />
                     )}
+                </div>
+                <div className="flex items-center justify-between pl-6">
+                    <label
+                        htmlFor="auto-transcribe"
+                        className="text-text-muted cursor-pointer text-sm"
+                    >
+                        Auto transcribe
+                    </label>
                     <Switch
                         id="auto-transcribe"
                         checked={settings?.autoTranscribe ?? false}
                         onCheckedChange={handleAutoTranscribeChange}
                     />
+                </div>
+                <div className="flex items-center justify-between pl-6">
+                    <span className="text-text-muted text-sm">Model</span>
+                    <Select
+                        value={settings?.transcriptionModel ?? DEFAULT_MODEL}
+                        onValueChange={handleModelChange}
+                    >
+                        <SelectTrigger size="sm" className="w-36">
+                            <SelectValue>
+                                {
+                                    TRANSCRIPTION_MODELS[
+                                        (settings?.transcriptionModel ??
+                                            DEFAULT_MODEL) as TranscriptionModel
+                                    ]?.label
+                                }
+                            </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            {Object.entries(TRANSCRIPTION_MODELS).map(
+                                ([key, config]) => (
+                                    <SelectItem key={key} value={key}>
+                                        <div className="flex flex-col">
+                                            <span>{config.label}</span>
+                                            <span className="text-text-muted text-xs">
+                                                {config.description}
+                                            </span>
+                                        </div>
+                                    </SelectItem>
+                                ),
+                            )}
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
         </aside>

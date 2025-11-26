@@ -5,6 +5,11 @@ import {
     whisperToTranscript,
     collapseConsecutiveSpeakers,
 } from "~/lib/schemas/transcript";
+import {
+    DEFAULT_MODEL,
+    transcriptionModelSchema,
+    type TranscriptionModel,
+} from "~/lib/transcription-models";
 import { newError, tryCatch } from "~/lib/try-catch";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { type db } from "~/server/db";
@@ -42,19 +47,30 @@ export const transcriptsRouter = createTRPCRouter({
                 };
             }
 
+            const parsed = transcriptionModelSchema.safeParse(
+                ctx.session.user.transcriptionModel,
+            );
+            const model = parsed.success ? parsed.data : DEFAULT_MODEL;
+
             if (existing) {
                 await ctx.db
                     .update(transcripts)
-                    .set({ status: "processing", error: null })
+                    .set({ status: "processing", error: null, model })
                     .where(eq(transcripts.id, existing.id));
             } else {
                 await ctx.db.insert(transcripts).values({
                     sourceId: input.sourceId,
                     status: "processing",
+                    model,
                 });
             }
 
-            void processTranscription(ctx.db, input.sourceId, source.url);
+            void processTranscription(
+                ctx.db,
+                input.sourceId,
+                source.url,
+                model,
+            );
 
             return { status: "processing" as const };
         }),
@@ -94,19 +110,30 @@ export const transcriptsRouter = createTRPCRouter({
                 where: eq(transcripts.sourceId, input.sourceId),
             });
 
+            const parsed = transcriptionModelSchema.safeParse(
+                ctx.session.user.transcriptionModel,
+            );
+            const model = parsed.success ? parsed.data : DEFAULT_MODEL;
+
             if (existing) {
                 await ctx.db
                     .update(transcripts)
-                    .set({ status: "processing", error: null })
+                    .set({ status: "processing", error: null, model })
                     .where(eq(transcripts.id, existing.id));
             } else {
                 await ctx.db.insert(transcripts).values({
                     sourceId: input.sourceId,
                     status: "processing",
+                    model,
                 });
             }
 
-            void processTranscription(ctx.db, input.sourceId, source.url);
+            void processTranscription(
+                ctx.db,
+                input.sourceId,
+                source.url,
+                model,
+            );
 
             return { success: true };
         }),
@@ -152,8 +179,9 @@ export async function processTranscription(
     database: typeof db,
     sourceId: string,
     audioUrl: string,
+    model: TranscriptionModel,
 ) {
-    const result = await transcribeAudio(audioUrl);
+    const result = await transcribeAudio(audioUrl, model);
 
     const transcriptExists = await database.query.transcripts.findFirst({
         where: eq(transcripts.sourceId, sourceId),

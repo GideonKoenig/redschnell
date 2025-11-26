@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { db } from "~/server/db";
 import * as schema from "~/server/db/schema";
 import { env } from "~/env";
+import { DEFAULT_MODEL } from "~/lib/transcription-models";
 
 export const auth = betterAuth({
     secret: env.BETTER_AUTH_SECRET,
@@ -20,6 +21,10 @@ export const auth = betterAuth({
             autoTranscribe: {
                 type: "boolean",
                 defaultValue: false,
+            },
+            transcriptionModel: {
+                type: "string",
+                defaultValue: DEFAULT_MODEL,
             },
         },
     },

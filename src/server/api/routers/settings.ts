@@ -1,15 +1,21 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import {
+    DEFAULT_MODEL,
+    transcriptionModelSchema,
+} from "~/lib/transcription-models";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { user } from "~/server/db/schema";
 
 const settingsSchema = z.object({
     autoTranscribe: z.boolean().optional(),
+    transcriptionModel: transcriptionModelSchema.optional(),
 });
 
 const defaultSettings = {
     role: "free",
     autoTranscribe: false,
+    transcriptionModel: DEFAULT_MODEL,
 } as const;
 
 export const settingsRouter = createTRPCRouter({
@@ -19,6 +25,7 @@ export const settingsRouter = createTRPCRouter({
             columns: {
                 role: true,
                 autoTranscribe: true,
+                transcriptionModel: true,
             },
         });
 
