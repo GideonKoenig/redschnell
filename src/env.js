@@ -12,6 +12,7 @@ export const env = createEnv({
         GOOGLE_CLIENT_SECRET: z.string(),
         UPLOADTHING_TOKEN: z.string(),
         FAL_KEY: z.string(),
+        DEEPGRAM_KEY: z.string(),
     },
 
     client: {
@@ -26,6 +27,7 @@ export const env = createEnv({
         GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
         UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
         FAL_KEY: process.env.FAL_KEY,
+        DEEPGRAM_KEY: process.env.DEEPGRAM_KEY,
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     },
     skipValidation: !!process.env.SKIP_ENV_VALIDATION,

@@ -16,6 +16,7 @@
     },
     "dependencies": {
         "@auth/drizzle-adapter": "^1.7.2",
+        "@deepgram/sdk": "^4.11.2",
         "@fal-ai/client": "^1.7.2",
         "@ffmpeg/ffmpeg": "^0.12.15",
         "@ffmpeg/util": "^0.12.2",

@@ -29,7 +29,7 @@ export const ourFileRouter = {
                 .insert(sources)
                 .values({
                     name: file.name,
-                    url: file.url,
+                    url: file.ufsUrl,
                     owner: metadata.userId,
                 })
                 .returning({ id: sources.id });
@@ -46,7 +46,7 @@ export const ourFileRouter = {
                     status: "processing",
                     model,
                 });
-                void processTranscription(db, source.id, file.url, model);
+                void processTranscription(db, source.id, file.ufsUrl, model);
             }
 
             return { sourceId: source.id };

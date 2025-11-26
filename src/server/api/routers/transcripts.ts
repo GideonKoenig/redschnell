@@ -1,20 +1,35 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import {
-    WhisperResponseSchema,
-    whisperToTranscript,
     collapseConsecutiveSpeakers,
+    type Transcript,
+    type TranscriptSegment,
 } from "~/lib/schemas/transcript";
 import {
     DEFAULT_MODEL,
     transcriptionModelSchema,
     type TranscriptionModel,
 } from "~/lib/transcription-models";
+import { transcribe, type TranscriptionResult } from "~/lib/transcription";
 import { newError, tryCatch } from "~/lib/try-catch";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { type db } from "~/server/db";
 import { sources, transcripts } from "~/server/db/schema";
-import { transcribeAudio } from "~/server/fal/whisper";
+
+function toTranscript(result: TranscriptionResult): Transcript {
+    const segments: TranscriptSegment[] = result.chunks.map((chunk, index) => ({
+        id: `segment-${index}`,
+        start: chunk.start,
+        end: chunk.end,
+        text: chunk.text,
+        speaker: chunk.speaker,
+    }));
+
+    return {
+        segments,
+        fullText: result.text,
+    };
+}
 
 export const transcriptsRouter = createTRPCRouter({
     get: protectedProcedure
@@ -158,12 +173,8 @@ export const transcriptsRouter = createTRPCRouter({
                 return { success: false };
             }
 
-            const parsed = WhisperResponseSchema.safeParse(existing.content);
-            if (!parsed.success) {
-                return { success: false };
-            }
-
-            const transcript = whisperToTranscript(parsed.data);
+            const content = existing.content as TranscriptionResult;
+            const transcript = toTranscript(content);
             const collapsed = collapseConsecutiveSpeakers(transcript);
 
             await ctx.db
@@ -181,7 +192,7 @@ export async function processTranscription(
     audioUrl: string,
     model: TranscriptionModel,
 ) {
-    const result = await transcribeAudio(audioUrl, model);
+    const result = await transcribe(audioUrl, model);
 
     const transcriptExists = await database.query.transcripts.findFirst({
         where: eq(transcripts.sourceId, sourceId),
@@ -191,14 +202,8 @@ export async function processTranscription(
     if (!transcriptExists) return;
 
     if (result.success) {
-        const parsed = WhisperResponseSchema.safeParse(result.data);
-        let processedContent = null;
-
-        if (parsed.success) {
-            const transcript = whisperToTranscript(parsed.data);
-            const collapsed = collapseConsecutiveSpeakers(transcript);
-            processedContent = collapsed;
-        }
+        const transcript = toTranscript(result.data);
+        const collapsed = collapseConsecutiveSpeakers(transcript);
 
         await tryCatch(
             database
@@ -206,7 +211,7 @@ export async function processTranscription(
                 .set({
                     status: "completed",
                     content: result.data,
-                    processedContent,
+                    processedContent: collapsed,
                     completedAt: new Date(),
                 })
                 .where(eq(transcripts.sourceId, sourceId)),

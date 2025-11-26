@@ -57,6 +57,8 @@ export const transcriptStatusEnum = pgEnum("transcript_status", [
 export const transcriptionModelEnum = pgEnum("transcription_model", [
     "fal-ai/whisper",
     "fal-ai/wizper",
+    "deepgram/nova-3",
+    "deepgram/nova-2",
 ]);
 
 export const transcripts = createTable(

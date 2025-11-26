@@ -1,0 +1,54 @@
+import { fal } from "@fal-ai/client";
+import { env } from "~/env";
+import { tryCatch, Success } from "~/lib/try-catch";
+import {
+    type TranscribeFunction,
+    type TranscriptionResult,
+} from "~/lib/transcription/types";
+
+fal.config({ credentials: env.FAL_KEY });
+
+type FalWhisperChunk = {
+    timestamp: [number, number | null];
+    text: string;
+    speaker?: string | null;
+};
+
+type FalWhisperResponse = {
+    text: string;
+    chunks: FalWhisperChunk[];
+};
+
+function normalizeResponse(response: FalWhisperResponse): TranscriptionResult {
+    return {
+        text: response.text,
+        chunks: response.chunks.map((chunk) => ({
+            start: chunk.timestamp[0],
+            end: chunk.timestamp[1] ?? chunk.timestamp[0],
+            text: chunk.text.trim(),
+            speaker: chunk.speaker ?? null,
+        })),
+    };
+}
+
+export const transcribeFal: TranscribeFunction = async (
+    audioUrl,
+    modelId,
+    supportsDiarization,
+) => {
+    const result = await tryCatch(
+        fal.subscribe(modelId, {
+            input: {
+                audio_url: audioUrl,
+                task: "transcribe",
+                chunk_level: "segment",
+                diarize: supportsDiarization,
+            },
+        }),
+    );
+
+    if (!result.success) return result;
+
+    const data = result.data.data as FalWhisperResponse;
+    return new Success(normalizeResponse(data));
+};
