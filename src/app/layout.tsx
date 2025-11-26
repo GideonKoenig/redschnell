@@ -13,9 +13,6 @@ export const metadata: Metadata = {
     title: "RedSchnell",
     description:
         "RedSchnell allows you to quickly create transcriptions from your audio and video files and search for information within them.",
-    icons: {
-        icon: "/favicon.ico",
-    },
 };
 
 export default async function RootLayout({
