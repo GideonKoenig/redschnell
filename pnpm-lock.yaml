@@ -17,6 +17,9 @@ importers:
       '@fal-ai/client':
         specifier: ^1.7.2
         version: 1.7.2
+      '@ffmpeg/core-mt':
+        specifier: ^0.12.10
+        version: 0.12.10
       '@ffmpeg/ffmpeg':
         specifier: ^0.12.15
         version: 0.12.15
@@ -1158,6 +1161,10 @@ packages:
   '@fal-ai/client@1.7.2':
     resolution: {integrity: sha512-RZ1Qz2Kza4ExKPy2D+2UUWthNApe+oZe8D1Wcxqleyn4F344MOm8ibgqG2JSVmybEcJAD4q44078WYfb6Q9c6w==}
     engines: {node: '>=18.0.0'}
+
+  '@ffmpeg/core-mt@0.12.10':
+    resolution: {integrity: sha512-atyRTOpa58bLCIgd6GXBZAXWyWD3AUoQyzxqjvGhp9MuSzdILtOTI62ffLswBsCnLq15lQ8IETHUpm1oe4V9FQ==}
+    engines: {node: '>=16.x'}
 
   '@ffmpeg/ffmpeg@0.12.15':
     resolution: {integrity: sha512-1C8Obr4GsN3xw+/1Ww6PFM84wSQAGsdoTuTWPOj2OizsRDLT4CXTaVjPhkw6ARyDus1B9X/L2LiXHqYYsGnRFw==}
@@ -5398,6 +5405,8 @@ snapshots:
       '@msgpack/msgpack': 3.1.2
       eventsource-parser: 1.1.2
       robot3: 0.4.1
+
+  '@ffmpeg/core-mt@0.12.10': {}
 
   '@ffmpeg/ffmpeg@0.12.15':
     dependencies:

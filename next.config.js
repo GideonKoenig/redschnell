@@ -6,7 +6,7 @@ await import("./src/env.js");
 const config = {
     headers: async () => [
         {
-            source: "/:path*",
+            source: "/((?!api).*)",
             headers: [
                 { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
                 {

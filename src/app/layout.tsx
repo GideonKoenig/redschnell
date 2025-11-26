@@ -19,7 +19,11 @@ export default async function RootLayout({
     children,
 }: Readonly<{ children: React.ReactNode }>) {
     return (
-        <html lang="en" className={`${GeistSans.variable}`}>
+        <html
+            lang="en"
+            suppressHydrationWarning
+            className={`${GeistSans.variable}`}
+        >
             <head>
                 <PlausibleProvider domain="redschnell.gko.gg" selfHosted />
             </head>
