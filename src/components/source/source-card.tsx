@@ -49,15 +49,6 @@ export function SourceCard(props: { source: SourceWithTranscript }) {
         }
     })();
 
-    const handleClick = () => {
-        if (!status) {
-            setTimeout(() => {
-                utils.sources.list.invalidate();
-                utils.sources.get.invalidate({ id: props.source.id });
-            }, 2000);
-        }
-    };
-
     const handleDelete = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -68,7 +59,6 @@ export function SourceCard(props: { source: SourceWithTranscript }) {
         <div className="group relative">
             <Link
                 href={`/app/source/${props.source.id}`}
-                onClick={handleClick}
                 data-active={isActive}
                 data-deleting={isDeleting}
                 className="hover:bg-bg-muted data-[active=true]:bg-bg-muted flex items-center gap-2 rounded-md p-2 pr-8 data-[deleting=true]:opacity-50"

@@ -26,9 +26,20 @@ export function Sidebar(props: {
     onCancelUpload: (id: string) => void;
 }) {
     const { uploads } = useUploadProgress();
-    const { data: sources, isLoading } = api.sources.list.useQuery();
+    const { data: sources, isLoading } = api.sources.list.useQuery(undefined, {
+        refetchInterval: (query) => {
+            const hasIncomplete = query.state.data?.some(
+                (s) =>
+                    !s.transcript ||
+                    s.transcript.status === "pending" ||
+                    s.transcript.status === "processing",
+            );
+            return hasIncomplete ? 3000 : false;
+        },
+    });
 
     const utils = api.useUtils();
+
     const { data: settings } = api.settings.get.useQuery();
     const updateSettings = api.settings.update.useMutation({
         onMutate: async (newSettings) => {
