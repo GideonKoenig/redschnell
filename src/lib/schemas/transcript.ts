@@ -25,6 +25,7 @@ export const TranscriptSegmentSchema = z.object({
 export const TranscriptSchema = z.object({
     segments: z.array(TranscriptSegmentSchema),
     fullText: z.string(),
+    speakerNames: z.record(z.string(), z.string()).optional(),
 });
 
 export type TranscriptSegment = z.infer<typeof TranscriptSegmentSchema>;
@@ -86,4 +87,14 @@ export function formatTimestamp(seconds: number): string {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+}
+
+export function getUniqueSpeakers(segments: TranscriptSegment[]): string[] {
+    const speakers = new Set<string>();
+    for (const segment of segments) {
+        if (segment.speaker) {
+            speakers.add(segment.speaker);
+        }
+    }
+    return Array.from(speakers).sort();
 }

@@ -1,16 +1,30 @@
 "use client";
 
-import { Clock, Copy, Loader2, RefreshCw, RotateCcw, User } from "lucide-react";
-import { useState } from "react";
+import {
+    Copy,
+    Loader2,
+    MoreHorizontal,
+    RefreshCw,
+    RotateCcw,
+} from "lucide-react";
 import { toast } from "sonner";
+import { SpeakerEditor } from "~/components/app/speaker-editor";
 import { Button } from "~/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import {
     TranscriptSchema,
     formatTimestamp,
+    getUniqueSpeakers,
     type Transcript,
     type TranscriptSegment,
 } from "~/lib/schemas/transcript";
+import { DEFAULT_SETTINGS } from "~/lib/settings";
 import {
     TRANSCRIPTION_MODELS,
     TranscriptionModel,
@@ -24,10 +38,9 @@ export function TranscriptView(props: {
     onRetry: () => void;
     isRetrying: boolean;
 }) {
-    const [showTimestamps, setShowTimestamps] = useState(true);
-    const [showSpeakers, setShowSpeakers] = useState(true);
-
     const utils = api.useUtils();
+    const { data: settings = DEFAULT_SETTINGS } = api.settings.get.useQuery();
+
     const reprocessMutation = api.transcripts.reprocess.useMutation({
         onSuccess: () => {
             utils.transcripts.get.invalidate({ sourceId: props.sourceId });
@@ -60,12 +73,22 @@ export function TranscriptView(props: {
     }
 
     const transcript = parsed.data;
+    const speakers = getUniqueSpeakers(transcript.segments);
+    const speakerNames = transcript.speakerNames ?? {};
+
+    const { showTimestamps, showSpeakers } = settings;
+
+    const maxSpeakerWidth = speakers.reduce((max, speaker) => {
+        const displayName = speakerNames[speaker] ?? speaker;
+        return Math.max(max, displayName.length);
+    }, 0);
 
     const copyAll = () => {
         const text = formatTranscriptText(
             transcript,
             showTimestamps,
             showSpeakers,
+            speakerNames,
         );
         navigator.clipboard.writeText(text);
         toast.success("Transcript copied to clipboard");
@@ -74,55 +97,53 @@ export function TranscriptView(props: {
     return (
         <div className="flex h-full flex-col">
             <div className="flex shrink-0 items-center gap-2 p-3">
-                <Button
-                    size="sm"
-                    variant={showTimestamps ? "secondary" : "ghost"}
-                    onClick={() => setShowTimestamps(!showTimestamps)}
-                >
-                    <Clock className="size-4" />
-                    Timestamps
-                </Button>
-                <Button
-                    size="sm"
-                    variant={showSpeakers ? "secondary" : "ghost"}
-                    onClick={() => setShowSpeakers(!showSpeakers)}
-                >
-                    <User className="size-4" />
-                    Speakers
-                </Button>
+                {speakers.length > 0 && (
+                    <SpeakerEditor
+                        sourceId={props.sourceId}
+                        speakers={speakers}
+                        speakerNames={speakerNames}
+                    />
+                )}
                 <div className="flex-1" />
-                <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={props.onRetry}
-                    disabled={props.isRetrying}
-                >
-                    {props.isRetrying ? (
-                        <Loader2 className="size-4 animate-spin" />
-                    ) : (
-                        <RotateCcw className="size-4" />
-                    )}
-                    Retranscribe
-                </Button>
-                <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() =>
-                        reprocessMutation.mutate({ sourceId: props.sourceId })
-                    }
-                    disabled={reprocessMutation.isPending}
-                >
-                    {reprocessMutation.isPending ? (
-                        <Loader2 className="size-4 animate-spin" />
-                    ) : (
-                        <RefreshCw className="size-4" />
-                    )}
-                    Reprocess
-                </Button>
                 <Button size="sm" variant="outline" onClick={copyAll}>
                     <Copy className="size-4" />
                     Copy all
                 </Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button size="icon-sm" variant="ghost">
+                            <MoreHorizontal className="size-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                            onClick={props.onRetry}
+                            disabled={props.isRetrying}
+                        >
+                            {props.isRetrying ? (
+                                <Loader2 className="size-4 animate-spin" />
+                            ) : (
+                                <RotateCcw className="size-4" />
+                            )}
+                            Retranscribe
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() =>
+                                reprocessMutation.mutate({
+                                    sourceId: props.sourceId,
+                                })
+                            }
+                            disabled={reprocessMutation.isPending}
+                        >
+                            {reprocessMutation.isPending ? (
+                                <Loader2 className="size-4 animate-spin" />
+                            ) : (
+                                <RefreshCw className="size-4" />
+                            )}
+                            Reprocess
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
 
             <div className="min-h-0 grow pl-3">
@@ -134,6 +155,8 @@ export function TranscriptView(props: {
                                 segment={segment}
                                 showTimestamp={showTimestamps}
                                 showSpeaker={showSpeakers}
+                                speakerNames={speakerNames}
+                                speakerWidth={maxSpeakerWidth}
                             />
                         ))}
                     </div>
@@ -154,14 +177,20 @@ function SegmentBlock(props: {
     segment: TranscriptSegment;
     showTimestamp: boolean;
     showSpeaker: boolean;
+    speakerNames: Record<string, string>;
+    speakerWidth: number;
 }) {
+    const displaySpeaker = props.segment.speaker
+        ? (props.speakerNames[props.segment.speaker] ?? props.segment.speaker)
+        : null;
+
     const copySegment = () => {
         let text = "";
         if (props.showTimestamp) {
             text += `[${formatTimestamp(props.segment.start)}] `;
         }
-        if (props.showSpeaker && props.segment.speaker) {
-            text += `${props.segment.speaker}: `;
+        if (props.showSpeaker && displaySpeaker) {
+            text += `${displaySpeaker}: `;
         }
         text += props.segment.text;
 
@@ -183,9 +212,12 @@ function SegmentBlock(props: {
                         [{formatTimestamp(props.segment.start)}]
                     </span>
                 )}
-                {props.showSpeaker && props.segment.speaker && (
-                    <span className="text-accent shrink-0 text-sm leading-6 font-medium">
-                        {props.segment.speaker}:
+                {props.showSpeaker && displaySpeaker && (
+                    <span
+                        className="text-accent shrink-0 truncate text-right text-sm leading-6 font-medium"
+                        style={{ width: `${props.speakerWidth * 0.5 + 1}rem` }}
+                    >
+                        {displaySpeaker}:
                     </span>
                 )}
                 <span className="text-text text-sm leading-6">
@@ -200,6 +232,7 @@ function formatTranscriptText(
     transcript: Transcript,
     includeTimestamps: boolean,
     includeSpeakers: boolean,
+    speakerNames: Record<string, string>,
 ): string {
     return transcript.segments
         .map((segment) => {
@@ -208,7 +241,9 @@ function formatTranscriptText(
                 line += `[${formatTimestamp(segment.start)}] `;
             }
             if (includeSpeakers && segment.speaker) {
-                line += `${segment.speaker}: `;
+                const displaySpeaker =
+                    speakerNames[segment.speaker] ?? segment.speaker;
+                line += `${displaySpeaker}: `;
             }
             line += segment.text;
             return line;

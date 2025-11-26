@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import {
     collapseConsecutiveSpeakers,
+    TranscriptSchema,
     type Transcript,
     type TranscriptSegment,
 } from "~/lib/schemas/transcript";
@@ -180,6 +181,51 @@ export const transcriptsRouter = createTRPCRouter({
             await ctx.db
                 .update(transcripts)
                 .set({ processedContent: collapsed })
+                .where(eq(transcripts.sourceId, input.sourceId));
+
+            return { success: true };
+        }),
+
+    updateSpeakerNames: protectedProcedure
+        .input(
+            z.object({
+                sourceId: z.string().uuid(),
+                speakerNames: z.record(z.string(), z.string()),
+            }),
+        )
+        .mutation(async ({ ctx, input }) => {
+            const source = await ctx.db.query.sources.findFirst({
+                where: eq(sources.id, input.sourceId),
+                columns: { owner: true },
+            });
+
+            if (!source || source.owner !== ctx.session.user.id) {
+                return { success: false };
+            }
+
+            const existing = await ctx.db.query.transcripts.findFirst({
+                where: eq(transcripts.sourceId, input.sourceId),
+            });
+
+            if (!existing?.processedContent) {
+                return { success: false };
+            }
+
+            const parsed = TranscriptSchema.safeParse(
+                existing.processedContent,
+            );
+            if (!parsed.success) {
+                return { success: false };
+            }
+
+            const updated: Transcript = {
+                ...parsed.data,
+                speakerNames: input.speakerNames,
+            };
+
+            await ctx.db
+                .update(transcripts)
+                .set({ processedContent: updated })
                 .where(eq(transcripts.sourceId, input.sourceId));
 
             return { success: true };

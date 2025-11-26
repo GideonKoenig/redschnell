@@ -1,22 +1,7 @@
 import { eq } from "drizzle-orm";
-import { z } from "zod";
-import {
-    DEFAULT_MODEL,
-    transcriptionModelSchema,
-} from "~/lib/transcription-models";
+import { DEFAULT_SETTINGS, settingsSchema } from "~/lib/settings";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { user } from "~/server/db/schema";
-
-const settingsSchema = z.object({
-    autoTranscribe: z.boolean().optional(),
-    transcriptionModel: transcriptionModelSchema.optional(),
-});
-
-const defaultSettings = {
-    role: "free",
-    autoTranscribe: false,
-    transcriptionModel: DEFAULT_MODEL,
-} as const;
 
 export const settingsRouter = createTRPCRouter({
     get: protectedProcedure.query(async ({ ctx }) => {
@@ -26,10 +11,12 @@ export const settingsRouter = createTRPCRouter({
                 role: true,
                 autoTranscribe: true,
                 transcriptionModel: true,
+                showTimestamps: true,
+                showSpeakers: true,
             },
         });
 
-        return result ?? defaultSettings;
+        return result ?? DEFAULT_SETTINGS;
     }),
 
     update: protectedProcedure

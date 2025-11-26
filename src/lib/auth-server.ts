@@ -26,6 +26,14 @@ export const auth = betterAuth({
                 type: "string",
                 defaultValue: DEFAULT_MODEL,
             },
+            showTimestamps: {
+                type: "boolean",
+                defaultValue: true,
+            },
+            showSpeakers: {
+                type: "boolean",
+                defaultValue: true,
+            },
         },
     },
     socialProviders: {

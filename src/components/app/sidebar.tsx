@@ -140,6 +140,36 @@ export function Sidebar(props: {
                     />
                 </div>
                 <div className="flex items-center justify-between pl-6">
+                    <label
+                        htmlFor="show-timestamps"
+                        className="text-text-muted cursor-pointer text-sm"
+                    >
+                        Show timestamps
+                    </label>
+                    <Switch
+                        id="show-timestamps"
+                        checked={settings?.showTimestamps ?? true}
+                        onCheckedChange={(checked) =>
+                            updateSettings.mutate({ showTimestamps: checked })
+                        }
+                    />
+                </div>
+                <div className="flex items-center justify-between pl-6">
+                    <label
+                        htmlFor="show-speakers"
+                        className="text-text-muted cursor-pointer text-sm"
+                    >
+                        Show speakers
+                    </label>
+                    <Switch
+                        id="show-speakers"
+                        checked={settings?.showSpeakers ?? true}
+                        onCheckedChange={(checked) =>
+                            updateSettings.mutate({ showSpeakers: checked })
+                        }
+                    />
+                </div>
+                <div className="flex items-center justify-between pl-6">
                     <span className="text-text-muted text-sm">Model</span>
                     <Select
                         value={settings?.transcriptionModel ?? DEFAULT_MODEL}

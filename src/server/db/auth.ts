@@ -25,6 +25,8 @@ export const user = createTable(
         transcriptionModel: varchar("transcription_model", { length: 64 })
             .notNull()
             .default(DEFAULT_MODEL),
+        showTimestamps: boolean("show_timestamps").notNull().default(true),
+        showSpeakers: boolean("show_speakers").notNull().default(true),
         createdAt: timestamp("created_at").notNull().defaultNow(),
         updatedAt: timestamp("updated_at").notNull().defaultNow(),
     },
