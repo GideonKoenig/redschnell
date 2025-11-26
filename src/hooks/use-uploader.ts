@@ -10,23 +10,25 @@ import { api } from "~/trpc/react";
 const { uploadFiles: uploadFilesUT } = generateReactHelpers<OurFileRouter>();
 
 export function useUploader() {
-    const { addUpload, updateUpload, dismissUpload } = useUploadProgress();
+    const { uploads, addUpload, updateUpload, dismissUpload } =
+        useUploadProgress();
     const utils = api.useUtils();
     const abortControllers = useRef(new Map<string, AbortController>());
 
     const uploadFiles = async (files: File[]) => {
-        const uploads = files.map((file) => ({
+        const fileUploads = files.map((file) => ({
             id: crypto.randomUUID(),
             file,
         }));
 
-        for (const { id, file } of uploads) {
+        for (const { id, file } of fileUploads) {
             addUpload(id, file.name);
             processAndUpload(id, file);
         }
     };
 
     const cancelUpload = (id: string) => {
+        const fileName = uploads[id]?.fileName;
         cancelConversion(id);
         const controller = abortControllers.current.get(id);
         if (controller) {
@@ -34,6 +36,7 @@ export function useUploader() {
             abortControllers.current.delete(id);
         }
         dismissUpload(id);
+        toast.info(`${fileName ?? "Upload"} cancelled`);
     };
 
     const processAndUpload = async (id: string, file: File) => {
@@ -50,7 +53,12 @@ export function useUploader() {
 
         if (!convertResult.success) {
             const error = newError(convertResult.error);
-            if (error.message === "Cancelled") return;
+            if (
+                error.message === "Cancelled" ||
+                error.message.includes("abort")
+            ) {
+                return;
+            }
 
             updateUpload(id, { phase: "error", error: error.message });
             toast.error(`Failed to convert ${file.name}: ${error.message}`);
@@ -76,10 +84,8 @@ export function useUploader() {
 
         if (!uploadResult.success) {
             const error = newError(uploadResult.error);
-            if (
-                error.message.includes("abort") ||
-                error.message === "Cancelled"
-            ) {
+            const msg = error.message.toLowerCase();
+            if (!msg || msg === "cancelled" || msg.includes("abort")) {
                 return;
             }
             updateUpload(id, { phase: "error", error: error.message });

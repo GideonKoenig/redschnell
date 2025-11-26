@@ -17,12 +17,25 @@ export async function convertAudio(
     onProgress?: (progress: number) => void,
     onStart?: () => void,
 ): Promise<Result<File>> {
-    return queueConversion(id, () => doConvert(file, onProgress), onStart);
+    const queueResult = await tryCatch(
+        queueConversion(
+            id,
+            (signal) => doConvert(file, onProgress, signal),
+            onStart,
+        ),
+    );
+
+    if (!queueResult.success) {
+        return new Failure(newError(queueResult.error));
+    }
+
+    return queueResult.data;
 }
 
 async function doConvert(
     file: File,
-    onProgress?: (progress: number) => void,
+    onProgress: ((progress: number) => void) | undefined,
+    signal: AbortSignal,
 ): Promise<Result<File>> {
     const ffmpegResult = await tryCatch(getFFmpeg());
     if (!ffmpegResult.success) {
@@ -43,13 +56,19 @@ async function doConvert(
         onProgress?.(Math.round(progress * 100));
     };
 
+    const cleanup = async () => {
+        ffmpeg.off("progress", progressHandler);
+        await tryCatch(ffmpeg.deleteFile(inputName));
+        await tryCatch(ffmpeg.deleteFile(outputName));
+    };
+
     ffmpeg.on("progress", progressHandler);
 
     const writeResult = await tryCatch(
         ffmpeg.writeFile(inputName, await fetchFile(file)),
     );
     if (!writeResult.success) {
-        ffmpeg.off("progress", progressHandler);
+        await cleanup();
         const err = newError(writeResult.error);
         return new Failure(
             new TryCatchError(
@@ -60,19 +79,23 @@ async function doConvert(
     }
 
     const execResult = await tryCatch(
-        ffmpeg.exec([
-            "-i",
-            inputName,
-            "-vn",
-            "-c:a",
-            "libmp3lame",
-            "-b:a",
-            "64k",
-            outputName,
-        ]),
+        ffmpeg.exec(
+            [
+                "-i",
+                inputName,
+                "-vn",
+                "-c:a",
+                "libmp3lame",
+                "-b:a",
+                "64k",
+                outputName,
+            ],
+            undefined,
+            { signal },
+        ),
     );
     if (!execResult.success) {
-        ffmpeg.off("progress", progressHandler);
+        await cleanup();
         const err = newError(execResult.error);
         return new Failure(
             new TryCatchError(
@@ -83,9 +106,9 @@ async function doConvert(
     }
 
     const readResult = await tryCatch(ffmpeg.readFile(outputName));
-    ffmpeg.off("progress", progressHandler);
 
     if (!readResult.success) {
+        await cleanup();
         const err = newError(readResult.error);
         return new Failure(
             new TryCatchError(
@@ -95,8 +118,7 @@ async function doConvert(
         );
     }
 
-    await tryCatch(ffmpeg.deleteFile(inputName));
-    await tryCatch(ffmpeg.deleteFile(outputName));
+    await cleanup();
 
     const uint8 = new Uint8Array(readResult.data as Uint8Array);
     const blob = new Blob([uint8], { type: "audio/mpeg" });
