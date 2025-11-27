@@ -37,7 +37,7 @@ export function ModelPicker(props: {
                     <SelectItem key={key} value={key}>
                         <div className="flex flex-col">
                             <div className="flex items-center gap-4">
-                                <span>{config.label}</span>
+                                <span className="min-w-54">{config.label}</span>
                                 <span className="text-text-muted text-xs">
                                     $
                                     {(PRICE_PER_AUDIO_MINUTE[key] * 60).toFixed(
