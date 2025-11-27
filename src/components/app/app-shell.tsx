@@ -32,7 +32,7 @@ export function AppShell(props: { children: ReactNode }) {
 
     return (
         <div
-            className="bg-bg-base grid h-screen w-screen grid-cols-[320px_1fr] gap-3 p-3"
+            className="bg-bg-base h-dvh w-dvw p-3"
             onDragEnter={onDragEnter}
             onDragLeave={onDragLeave}
             onDragOver={onDragOver}
@@ -47,14 +47,18 @@ export function AppShell(props: { children: ReactNode }) {
                 onChange={handleFileSelect}
             />
 
-            <Sidebar
-                onUploadClick={openFilePicker}
-                onCancelUpload={cancelUpload}
-            />
+            <div className="mx-auto h-full max-w-5xl">
+                <div className="grid h-full grid-cols-[20rem_1fr] gap-3">
+                    <Sidebar
+                        onUploadClick={openFilePicker}
+                        onCancelUpload={cancelUpload}
+                    />
 
-            <main className="bg-bg-surface border-border relative h-full overflow-hidden rounded-lg border shadow-sm">
-                {props.children}
-            </main>
+                    <main className="bg-bg-surface border-border relative h-full overflow-hidden rounded-lg border shadow-sm">
+                        {props.children}
+                    </main>
+                </div>
+            </div>
 
             {isDragging && (
                 <div className="bg-accent/5 border-accent pointer-events-none fixed inset-3 z-50 flex items-center justify-center rounded-lg border-2 border-dashed">
