@@ -49,9 +49,9 @@ export function SegmentBlock(props: {
                 {props.showSpeaker && displaySpeaker && (
                     <span
                         className="text-accent shrink-0 truncate text-right text-sm leading-6 font-medium"
-                        style={{ width: `${props.speakerWidth}ch` }}
+                        style={{ width: `${props.speakerWidth + 1}ch` }}
                     >
-                        {displaySpeaker}:
+                        {`${displaySpeaker}:`}
                     </span>
                 )}
                 <span className="text-text text-sm leading-6">
