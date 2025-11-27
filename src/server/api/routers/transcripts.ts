@@ -12,6 +12,7 @@ import {
     type TranscriptionModel,
 } from "~/lib/transcription-models";
 import { transcribe, type TranscriptionResult } from "~/lib/transcription";
+import { trackEvent } from "~/lib/plausible";
 import { newError, tryCatch } from "~/lib/try-catch";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { type db } from "~/server/db";
@@ -273,6 +274,8 @@ export async function processTranscription(
     if (!transcriptExists) return;
 
     if (result.success) {
+        void trackEvent({ name: "transcription", props: { model } });
+
         const transcript = toTranscript(result.data);
         const collapsed = collapseConsecutiveSpeakers(transcript);
         const price = result.data.metadata?.priceUsd?.toString();

@@ -1,4 +1,5 @@
 import { generateReactHelpers } from "@uploadthing/react";
+import { usePlausible } from "next-plausible";
 import { useRef } from "react";
 import { toast } from "sonner";
 import type { OurFileRouter } from "~/app/api/uploadthing/core";
@@ -13,6 +14,7 @@ export function useUploader() {
     const { uploads, addUpload, updateUpload, dismissUpload } =
         useUploadProgress();
     const utils = api.useUtils();
+    const plausible = usePlausible();
     const abortControllers = useRef(new Map<string, AbortController>());
 
     const uploadFiles = async (files: File[]) => {
@@ -95,6 +97,7 @@ export function useUploader() {
 
         const result = uploadResult.data;
         if (result.length > 0 && result[0]) {
+            plausible("file-upload");
             await utils.sources.list.invalidate();
             dismissUpload(id);
             toast.success(`${file.name} uploaded successfully`);
