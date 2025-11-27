@@ -41,7 +41,7 @@ export function AppShell(props: { children: ReactNode }) {
             <input
                 ref={fileInputRef}
                 type="file"
-                accept="audio/*,video/*"
+                accept="audio/*,video/*,.mkv"
                 multiple
                 className="hidden"
                 onChange={handleFileSelect}
