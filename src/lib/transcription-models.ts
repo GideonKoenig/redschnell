@@ -10,33 +10,33 @@ type ModelConfig = {
 };
 
 const MODELS = {
-    "fal-ai/whisper": {
-        label: "Whisper",
-        description: "Best overall - supports speaker identification",
-        supportsDiarization: true,
-        provider: "fal",
-        modelId: "fal-ai/whisper",
-    },
-    "fal-ai/wizper": {
-        label: "Wizper",
-        description: "2x faster - same accuracy, no speaker ID",
-        supportsDiarization: false,
-        provider: "fal",
-        modelId: "fal-ai/wizper",
-    },
     "deepgram/nova-3": {
         label: "Nova 3",
-        description: "Deepgram's latest - highest accuracy",
+        description: "Best overall",
         supportsDiarization: true,
         provider: "deepgram",
         modelId: "nova-3",
     },
     "deepgram/nova-2": {
         label: "Nova 2",
-        description: "Deepgram - fast and accurate",
+        description: "Faster and cheaper, slightly less accurate",
         supportsDiarization: true,
         provider: "deepgram",
         modelId: "nova-2",
+    },
+    "fal-ai/whisper": {
+        label: "Whisper",
+        description: "The original, reliable standby",
+        supportsDiarization: true,
+        provider: "fal",
+        modelId: "fal-ai/whisper",
+    },
+    "fal-ai/wizper": {
+        label: "Wizper",
+        description: "Cheap and fast, no speaker ID",
+        supportsDiarization: false,
+        provider: "fal",
+        modelId: "fal-ai/wizper",
     },
 } as const satisfies Record<string, ModelConfig>;
 

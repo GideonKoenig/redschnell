@@ -3,16 +3,18 @@ import {
     index,
     integer,
     json,
+    numeric,
     pgEnum,
     timestamp,
     uuid,
     varchar,
 } from "drizzle-orm/pg-core";
-import { user } from "~/server/db/auth";
+import { transcriptionModelEnum, user } from "~/server/db/auth";
 import { createTable } from "~/server/db/utils";
 
 export {
     userRoleEnum,
+    transcriptionModelEnum,
     user,
     userRelations,
     account,
@@ -28,7 +30,8 @@ export const sources = createTable(
         id: uuid("id").defaultRandom().primaryKey(),
         name: varchar("name", { length: 512 }).notNull(),
         url: varchar("url", { length: 1024 }).notNull(),
-        duration: integer("duration"),
+        fileSize: integer("file_size").notNull(),
+        duration: integer("duration").notNull(),
         owner: varchar("owner", { length: 255 })
             .notNull()
             .references(() => user.id),
@@ -54,13 +57,6 @@ export const transcriptStatusEnum = pgEnum("transcript_status", [
     "failed",
 ]);
 
-export const transcriptionModelEnum = pgEnum("transcription_model", [
-    "fal-ai/whisper",
-    "fal-ai/wizper",
-    "deepgram/nova-3",
-    "deepgram/nova-2",
-]);
-
 export const transcripts = createTable(
     "transcript",
     {
@@ -74,9 +70,11 @@ export const transcripts = createTable(
         content: json("content"),
         processedContent: json("processed_content"),
         error: varchar("error", { length: 1024 }),
+        price: numeric("price", { precision: 10, scale: 6 }),
         createdAt: timestamp("created_at", { withTimezone: true })
             .default(sql`CURRENT_TIMESTAMP`)
             .notNull(),
+        startedAt: timestamp("started_at", { withTimezone: true }),
         completedAt: timestamp("completed_at", { withTimezone: true }),
     },
     (transcript) => ({

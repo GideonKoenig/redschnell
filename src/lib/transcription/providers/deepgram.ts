@@ -1,9 +1,10 @@
 import { createClient } from "@deepgram/sdk";
 import { env } from "~/env";
-import { tryCatch, Success, Failure, TryCatchError } from "~/lib/try-catch";
+import { TRANSCRIPTION_MODELS } from "~/lib/transcription-models";
+import { Failure, Success, TryCatchError, tryCatch } from "~/lib/try-catch";
+import { calculatePrice } from "~/lib/transcription/pricing";
 import {
     type TranscribeFunction,
-    type TranscriptionResult,
     type TranscriptionChunk,
 } from "~/lib/transcription/types";
 
@@ -11,9 +12,12 @@ const client = createClient(env.DEEPGRAM_KEY);
 
 export const transcribeDeepgram: TranscribeFunction = async (
     audioUrl,
-    modelId,
+    model,
     supportsDiarization,
+    _durationSeconds,
 ) => {
+    const modelId = TRANSCRIPTION_MODELS[model].modelId;
+
     const result = await tryCatch(
         client.listen.prerecorded.transcribeUrl(
             { url: audioUrl },
@@ -91,8 +95,12 @@ export const transcribeDeepgram: TranscribeFunction = async (
         }
     }
 
+    const durationSeconds = response.metadata.duration;
+    const priceUsd = calculatePrice(durationSeconds, model);
+
     return new Success({
         text: alternative.transcript,
         chunks,
+        metadata: { priceUsd },
     });
 };

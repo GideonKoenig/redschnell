@@ -8,6 +8,7 @@ import {
     RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
+import { SegmentBlock } from "~/components/app/segment-block";
 import { SpeakerEditor } from "~/components/app/speaker-editor";
 import { Button } from "~/components/ui/button";
 import {
@@ -18,23 +19,19 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import {
-    TranscriptSchema,
-    formatTimestamp,
-    getUniqueSpeakers,
-    type Transcript,
-    type TranscriptSegment,
-} from "~/lib/schemas/transcript";
+    formatDuration,
+    formatFileSize,
+    formatProcessingTime,
+    formatTranscriptText,
+} from "~/lib/format";
+import { TranscriptSchema, getUniqueSpeakers } from "~/lib/schemas/transcript";
 import { DEFAULT_SETTINGS } from "~/lib/settings";
-import {
-    TRANSCRIPTION_MODELS,
-    TranscriptionModel,
-} from "~/lib/transcription-models";
+import { TRANSCRIPTION_MODELS } from "~/lib/transcription-models";
+import { type CompletedTranscript } from "~/lib/types";
 import { api } from "~/trpc/react";
 
 export function TranscriptView(props: {
-    content: unknown;
-    sourceId: string;
-    model: TranscriptionModel;
+    transcript: CompletedTranscript;
     onRetry: () => void;
     isRetrying: boolean;
 }) {
@@ -43,7 +40,9 @@ export function TranscriptView(props: {
 
     const reprocessMutation = api.transcripts.reprocess.useMutation({
         onSuccess: () => {
-            utils.transcripts.get.invalidate({ sourceId: props.sourceId });
+            utils.transcripts.get.invalidate({
+                sourceId: props.transcript.sourceId,
+            });
             toast.success("Transcript reprocessed");
         },
         onError: () => {
@@ -51,7 +50,9 @@ export function TranscriptView(props: {
         },
     });
 
-    const parsed = TranscriptSchema.safeParse(props.content);
+    const parsed = TranscriptSchema.safeParse(
+        props.transcript.processedContent,
+    );
     if (!parsed.success) {
         return (
             <div className="text-text-muted space-y-4">
@@ -65,7 +66,11 @@ export function TranscriptView(props: {
                 <details className="text-xs">
                     <summary className="cursor-pointer">Received data</summary>
                     <pre className="bg-bg-muted mt-2 overflow-auto rounded p-2">
-                        {JSON.stringify(props.content, null, 2)}
+                        {JSON.stringify(
+                            props.transcript.processedContent,
+                            null,
+                            2,
+                        )}
                     </pre>
                 </details>
             </div>
@@ -99,7 +104,7 @@ export function TranscriptView(props: {
             <div className="flex shrink-0 items-center gap-2 p-3">
                 {speakers.length > 0 && (
                     <SpeakerEditor
-                        sourceId={props.sourceId}
+                        sourceId={props.transcript.sourceId}
                         speakers={speakers}
                         speakerNames={speakerNames}
                     />
@@ -130,7 +135,7 @@ export function TranscriptView(props: {
                         <DropdownMenuItem
                             onClick={() =>
                                 reprocessMutation.mutate({
-                                    sourceId: props.sourceId,
+                                    sourceId: props.transcript.sourceId,
                                 })
                             }
                             disabled={reprocessMutation.isPending}
@@ -163,90 +168,43 @@ export function TranscriptView(props: {
                 </ScrollArea>
             </div>
 
-            <div className="text-text-muted border-border mt-1 shrink-0 border-t px-3 py-2 text-xs">
-                Transcription provided by{" "}
-                <span className="text-text font-medium">
-                    {TRANSCRIPTION_MODELS[props.model].label}
-                </span>
-            </div>
+            <TranscriptFooter transcript={props.transcript} />
         </div>
     );
 }
 
-function SegmentBlock(props: {
-    segment: TranscriptSegment;
-    showTimestamp: boolean;
-    showSpeaker: boolean;
-    speakerNames: Record<string, string>;
-    speakerWidth: number;
-}) {
-    const displaySpeaker = props.segment.speaker
-        ? (props.speakerNames[props.segment.speaker] ?? props.segment.speaker)
-        : null;
-
-    const copySegment = () => {
-        let text = "";
-        if (props.showTimestamp) {
-            text += `[${formatTimestamp(props.segment.start)}] `;
-        }
-        if (props.showSpeaker && displaySpeaker) {
-            text += `${displaySpeaker}: `;
-        }
-        text += props.segment.text;
-
-        navigator.clipboard.writeText(text);
-        toast.success("Segment copied");
-    };
+function TranscriptFooter(props: { transcript: CompletedTranscript }) {
+    const { transcript } = props;
 
     return (
-        <button
-            onClick={copySegment}
-            className="hover:bg-bg-muted group relative cursor-pointer rounded-md p-2 text-left"
-        >
-            <div className="bg-bg-surface border-border absolute top-1 right-1 rounded border p-1 opacity-0 shadow-sm group-hover:opacity-100">
-                <Copy className="text-text-muted size-3.5" />
-            </div>
-            <div className="flex items-start gap-2">
-                {props.showTimestamp && (
-                    <span className="text-text-muted shrink-0 font-mono text-xs leading-6">
-                        [{formatTimestamp(props.segment.start)}]
-                    </span>
-                )}
-                {props.showSpeaker && displaySpeaker && (
-                    <span
-                        className="text-accent shrink-0 truncate text-right text-sm leading-6 font-medium"
-                        style={{ width: `${props.speakerWidth * 0.5 + 1}rem` }}
-                    >
-                        {displaySpeaker}:
-                    </span>
-                )}
-                <span className="text-text text-sm leading-6">
-                    {props.segment.text}
+        <div className="text-text-muted border-border mt-1 flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 border-t px-3 py-2 text-xs">
+            <span>
+                <span className="text-text font-medium">
+                    {TRANSCRIPTION_MODELS[transcript.model].label}
                 </span>
-            </div>
-        </button>
+            </span>
+            <span className="text-border">·</span>
+            <span>{formatDuration(transcript.source.duration)}</span>
+            <span className="text-border">·</span>
+            <span>{formatFileSize(transcript.source.fileSize)}</span>
+            {transcript.startedAt && transcript.completedAt && (
+                <>
+                    <span className="text-border">·</span>
+                    <span>
+                        Transcribed in{" "}
+                        {formatProcessingTime(
+                            new Date(transcript.completedAt).getTime() -
+                                new Date(transcript.startedAt).getTime(),
+                        )}
+                    </span>
+                </>
+            )}
+            {transcript.price && (
+                <>
+                    <span className="text-border">·</span>
+                    <span>${parseFloat(transcript.price).toFixed(4)}</span>
+                </>
+            )}
+        </div>
     );
-}
-
-function formatTranscriptText(
-    transcript: Transcript,
-    includeTimestamps: boolean,
-    includeSpeakers: boolean,
-    speakerNames: Record<string, string>,
-): string {
-    return transcript.segments
-        .map((segment) => {
-            let line = "";
-            if (includeTimestamps) {
-                line += `[${formatTimestamp(segment.start)}] `;
-            }
-            if (includeSpeakers && segment.speaker) {
-                const displaySpeaker =
-                    speakerNames[segment.speaker] ?? segment.speaker;
-                line += `${displaySpeaker}: `;
-            }
-            line += segment.text;
-            return line;
-        })
-        .join("\n");
 }

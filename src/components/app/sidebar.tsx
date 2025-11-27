@@ -1,24 +1,14 @@
 "use client";
 
 import { Loader2, Plus, Settings } from "lucide-react";
+import { ModelPicker } from "~/components/app/model-picker";
 import { useUploadProgress } from "~/components/providers/upload-progress-provider";
 import { SourceCard } from "~/components/source/source-card";
 import { UploadItemCard } from "~/components/source/upload-item-card";
 import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "~/components/ui/select";
 import { Switch } from "~/components/ui/switch";
-import {
-    DEFAULT_MODEL,
-    TRANSCRIPTION_MODELS,
-    type TranscriptionModel,
-} from "~/lib/transcription-models";
+import { type TranscriptionModel } from "~/lib/transcription-models";
 import { api } from "~/trpc/react";
 
 export function Sidebar(props: {
@@ -64,15 +54,7 @@ export function Sidebar(props: {
     const uploadList = Object.values(uploads);
     const isEmpty = !isLoading && !sources?.length && uploadList.length === 0;
 
-    const handleAutoTranscribeChange = (checked: boolean) => {
-        updateSettings.mutate({ autoTranscribe: checked });
-    };
-
-    const handleModelChange = (value: string) => {
-        updateSettings.mutate({
-            transcriptionModel: value as TranscriptionModel,
-        });
-    };
+    const update = updateSettings.mutate;
 
     return (
         <aside className="bg-bg-surface border-border flex h-full flex-col rounded-lg border shadow-sm">
@@ -116,92 +98,56 @@ export function Sidebar(props: {
                 </div>
             </ScrollArea>
 
-            <div className="border-border flex flex-col gap-2 border-t px-3 py-2">
-                <div className="flex items-center gap-2">
-                    <Settings className="text-text-muted size-4" />
-                    <span className="text-text-muted text-sm font-medium">
-                        Settings
-                    </span>
-                    {updateSettings.isPending && (
-                        <Loader2 className="text-text-muted ml-auto size-3.5 animate-spin" />
-                    )}
+            {settings && (
+                <div className="border-border flex flex-col gap-2 border-t px-3 py-2">
+                    <div className="flex items-center gap-2">
+                        <Settings className="text-text-muted size-4" />
+                        <span className="text-text-muted text-sm font-medium">
+                            Settings
+                        </span>
+                        {updateSettings.isPending && (
+                            <Loader2 className="text-text-muted ml-auto size-3.5 animate-spin" />
+                        )}
+                    </div>
+                    <SettingRow label="Auto transcribe">
+                        <Switch
+                            checked={settings.autoTranscribe}
+                            onCheckedChange={(v) =>
+                                update({ autoTranscribe: v })
+                            }
+                        />
+                    </SettingRow>
+                    <SettingRow label="Show timestamps">
+                        <Switch
+                            checked={settings.showTimestamps}
+                            onCheckedChange={(v) =>
+                                update({ showTimestamps: v })
+                            }
+                        />
+                    </SettingRow>
+                    <SettingRow label="Show speakers">
+                        <Switch
+                            checked={settings.showSpeakers}
+                            onCheckedChange={(v) => update({ showSpeakers: v })}
+                        />
+                    </SettingRow>
+                    <SettingRow label="Model">
+                        <ModelPicker
+                            value={settings.transcriptionModel}
+                            onChange={(v) => update({ transcriptionModel: v })}
+                        />
+                    </SettingRow>
                 </div>
-                <div className="flex items-center justify-between pl-6">
-                    <label
-                        htmlFor="auto-transcribe"
-                        className="text-text-muted cursor-pointer text-sm"
-                    >
-                        Auto transcribe
-                    </label>
-                    <Switch
-                        id="auto-transcribe"
-                        checked={settings?.autoTranscribe ?? false}
-                        onCheckedChange={handleAutoTranscribeChange}
-                    />
-                </div>
-                <div className="flex items-center justify-between pl-6">
-                    <label
-                        htmlFor="show-timestamps"
-                        className="text-text-muted cursor-pointer text-sm"
-                    >
-                        Show timestamps
-                    </label>
-                    <Switch
-                        id="show-timestamps"
-                        checked={settings?.showTimestamps ?? true}
-                        onCheckedChange={(checked) =>
-                            updateSettings.mutate({ showTimestamps: checked })
-                        }
-                    />
-                </div>
-                <div className="flex items-center justify-between pl-6">
-                    <label
-                        htmlFor="show-speakers"
-                        className="text-text-muted cursor-pointer text-sm"
-                    >
-                        Show speakers
-                    </label>
-                    <Switch
-                        id="show-speakers"
-                        checked={settings?.showSpeakers ?? true}
-                        onCheckedChange={(checked) =>
-                            updateSettings.mutate({ showSpeakers: checked })
-                        }
-                    />
-                </div>
-                <div className="flex items-center justify-between pl-6">
-                    <span className="text-text-muted text-sm">Model</span>
-                    <Select
-                        value={settings?.transcriptionModel ?? DEFAULT_MODEL}
-                        onValueChange={handleModelChange}
-                    >
-                        <SelectTrigger size="sm" className="w-36">
-                            <SelectValue>
-                                {
-                                    TRANSCRIPTION_MODELS[
-                                        (settings?.transcriptionModel ??
-                                            DEFAULT_MODEL) as TranscriptionModel
-                                    ]?.label
-                                }
-                            </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                            {Object.entries(TRANSCRIPTION_MODELS).map(
-                                ([key, config]) => (
-                                    <SelectItem key={key} value={key}>
-                                        <div className="flex flex-col">
-                                            <span>{config.label}</span>
-                                            <span className="text-text-muted text-xs">
-                                                {config.description}
-                                            </span>
-                                        </div>
-                                    </SelectItem>
-                                ),
-                            )}
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
+            )}
         </aside>
+    );
+}
+
+function SettingRow(props: { label: string; children: React.ReactNode }) {
+    return (
+        <div className="flex items-center justify-between pl-6">
+            <span className="text-text-muted text-sm">{props.label}</span>
+            {props.children}
+        </div>
     );
 }

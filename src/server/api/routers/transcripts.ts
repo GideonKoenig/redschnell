@@ -49,7 +49,14 @@ export const transcriptsRouter = createTRPCRouter({
             });
 
             if (existing?.status === "completed") {
-                return existing;
+                return {
+                    ...existing,
+                    status: "completed" as const,
+                    source: {
+                        duration: source.duration,
+                        fileSize: source.fileSize,
+                    },
+                };
             }
 
             if (existing?.status === "processing") {
@@ -68,16 +75,24 @@ export const transcriptsRouter = createTRPCRouter({
             );
             const model = parsed.success ? parsed.data : DEFAULT_MODEL;
 
+            const startedAt = new Date();
+
             if (existing) {
                 await ctx.db
                     .update(transcripts)
-                    .set({ status: "processing", error: null, model })
+                    .set({
+                        status: "processing",
+                        error: null,
+                        model,
+                        startedAt,
+                    })
                     .where(eq(transcripts.id, existing.id));
             } else {
                 await ctx.db.insert(transcripts).values({
                     sourceId: input.sourceId,
                     status: "processing",
                     model,
+                    startedAt,
                 });
             }
 
@@ -86,6 +101,7 @@ export const transcriptsRouter = createTRPCRouter({
                 input.sourceId,
                 source.url,
                 model,
+                source.duration,
             );
 
             return { status: "processing" as const };
@@ -130,17 +146,24 @@ export const transcriptsRouter = createTRPCRouter({
                 ctx.session.user.transcriptionModel,
             );
             const model = parsed.success ? parsed.data : DEFAULT_MODEL;
+            const startedAt = new Date();
 
             if (existing) {
                 await ctx.db
                     .update(transcripts)
-                    .set({ status: "processing", error: null, model })
+                    .set({
+                        status: "processing",
+                        error: null,
+                        model,
+                        startedAt,
+                    })
                     .where(eq(transcripts.id, existing.id));
             } else {
                 await ctx.db.insert(transcripts).values({
                     sourceId: input.sourceId,
                     status: "processing",
                     model,
+                    startedAt,
                 });
             }
 
@@ -149,6 +172,7 @@ export const transcriptsRouter = createTRPCRouter({
                 input.sourceId,
                 source.url,
                 model,
+                source.duration,
             );
 
             return { success: true };
@@ -237,8 +261,9 @@ export async function processTranscription(
     sourceId: string,
     audioUrl: string,
     model: TranscriptionModel,
+    durationSeconds: number,
 ) {
-    const result = await transcribe(audioUrl, model);
+    const result = await transcribe(audioUrl, model, durationSeconds);
 
     const transcriptExists = await database.query.transcripts.findFirst({
         where: eq(transcripts.sourceId, sourceId),
@@ -250,6 +275,7 @@ export async function processTranscription(
     if (result.success) {
         const transcript = toTranscript(result.data);
         const collapsed = collapseConsecutiveSpeakers(transcript);
+        const price = result.data.metadata?.priceUsd?.toString();
 
         await tryCatch(
             database
@@ -258,6 +284,7 @@ export async function processTranscription(
                     status: "completed",
                     content: result.data,
                     processedContent: collapsed,
+                    price,
                     completedAt: new Date(),
                 })
                 .where(eq(transcripts.sourceId, sourceId)),
@@ -267,7 +294,11 @@ export async function processTranscription(
         await tryCatch(
             database
                 .update(transcripts)
-                .set({ status: "failed", error: error.message })
+                .set({
+                    status: "failed",
+                    error: error.message,
+                    completedAt: new Date(),
+                })
                 .where(eq(transcripts.sourceId, sourceId)),
         );
     }

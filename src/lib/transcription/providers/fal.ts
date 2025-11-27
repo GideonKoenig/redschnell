@@ -1,6 +1,7 @@
 import { fal } from "@fal-ai/client";
 import { env } from "~/env";
 import { tryCatch, Success } from "~/lib/try-catch";
+import { calculatePrice } from "~/lib/transcription/pricing";
 import {
     type TranscribeFunction,
     type TranscriptionResult,
@@ -33,11 +34,12 @@ function normalizeResponse(response: FalWhisperResponse): TranscriptionResult {
 
 export const transcribeFal: TranscribeFunction = async (
     audioUrl,
-    modelId,
+    model,
     supportsDiarization,
+    durationSeconds,
 ) => {
     const result = await tryCatch(
-        fal.subscribe(modelId, {
+        fal.subscribe(model, {
             input: {
                 audio_url: audioUrl,
                 task: "transcribe",
@@ -50,5 +52,10 @@ export const transcribeFal: TranscribeFunction = async (
     if (!result.success) return result;
 
     const data = result.data.data as FalWhisperResponse;
-    return new Success(normalizeResponse(data));
+    const priceUsd = calculatePrice(durationSeconds, model);
+
+    return new Success({
+        ...normalizeResponse(data),
+        metadata: { priceUsd },
+    });
 };

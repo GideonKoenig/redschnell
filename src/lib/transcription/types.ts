@@ -1,3 +1,4 @@
+import { type TranscriptionModel } from "~/lib/transcription-models";
 import { type Result } from "~/lib/try-catch";
 
 export type TranscriptionChunk = {
@@ -7,15 +8,21 @@ export type TranscriptionChunk = {
     speaker: string | null;
 };
 
+export type TranscriptionMetadata = {
+    priceUsd?: number;
+};
+
 export type TranscriptionResult = {
     text: string;
     chunks: TranscriptionChunk[];
+    metadata?: TranscriptionMetadata;
 };
 
 export type TranscriptionProvider = "fal" | "deepgram";
 
 export type TranscribeFunction = (
     audioUrl: string,
-    modelId: string,
+    model: TranscriptionModel,
     supportsDiarization: boolean,
+    durationSeconds: number,
 ) => Promise<Result<TranscriptionResult>>;

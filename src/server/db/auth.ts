@@ -1,16 +1,22 @@
 import { relations } from "drizzle-orm";
 import {
+    boolean,
     index,
+    pgEnum,
     text,
     timestamp,
-    boolean,
     varchar,
-    pgEnum,
 } from "drizzle-orm/pg-core";
-import { DEFAULT_MODEL } from "~/lib/transcription-models";
 import { createTable } from "~/server/db/utils";
 
 export const userRoleEnum = pgEnum("user_role", ["free", "paid", "admin"]);
+
+export const transcriptionModelEnum = pgEnum("transcription_model", [
+    "fal-ai/whisper",
+    "fal-ai/wizper",
+    "deepgram/nova-3",
+    "deepgram/nova-2",
+]);
 
 export const user = createTable(
     "user",
@@ -22,9 +28,9 @@ export const user = createTable(
         image: varchar("image", { length: 255 }),
         role: userRoleEnum("role").notNull().default("free"),
         autoTranscribe: boolean("auto_transcribe").notNull().default(false),
-        transcriptionModel: varchar("transcription_model", { length: 64 })
+        transcriptionModel: transcriptionModelEnum("transcription_model")
             .notNull()
-            .default(DEFAULT_MODEL),
+            .default("deepgram/nova-3"),
         showTimestamps: boolean("show_timestamps").notNull().default(true),
         showSpeakers: boolean("show_speakers").notNull().default(true),
         createdAt: timestamp("created_at").notNull().defaultNow(),

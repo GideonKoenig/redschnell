@@ -25,11 +25,16 @@ export const ourFileRouter = {
             };
         })
         .onUploadComplete(async ({ metadata, file }) => {
+            const fileSize = file.size;
+            const duration = Math.round((fileSize * 8) / 64000);
+
             const [source] = await db
                 .insert(sources)
                 .values({
                     name: file.name,
                     url: file.ufsUrl,
+                    fileSize,
+                    duration,
                     owner: metadata.userId,
                 })
                 .returning({ id: sources.id });
@@ -45,8 +50,15 @@ export const ourFileRouter = {
                     sourceId: source.id,
                     status: "processing",
                     model,
+                    startedAt: new Date(),
                 });
-                void processTranscription(db, source.id, file.ufsUrl, model);
+                void processTranscription(
+                    db,
+                    source.id,
+                    file.ufsUrl,
+                    model,
+                    duration,
+                );
             }
 
             return { sourceId: source.id };
