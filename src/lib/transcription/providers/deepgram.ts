@@ -23,6 +23,7 @@ export const transcribeDeepgram: TranscribeFunction = async (
             { url: audioUrl },
             {
                 model: modelId,
+                language: "multi",
                 smart_format: true,
                 diarize: supportsDiarization,
                 punctuate: true,
