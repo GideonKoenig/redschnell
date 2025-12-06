@@ -6,10 +6,11 @@ import {
     type Transcript,
     type TranscriptSegment,
 } from "~/lib/schemas/transcript";
+import { type User } from "~/lib/auth-server";
+import { type Settings } from "~/lib/settings";
 import {
     DEFAULT_MODEL,
     transcriptionModelSchema,
-    type TranscriptionModel,
 } from "~/lib/transcription-models";
 import { transcribe, type TranscriptionResult } from "~/lib/transcription";
 import { trackEvent } from "~/lib/plausible";
@@ -17,21 +18,6 @@ import { newError, tryCatch } from "~/lib/try-catch";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { type db } from "~/server/db";
 import { sources, transcripts } from "~/server/db/schema";
-
-function toTranscript(result: TranscriptionResult): Transcript {
-    const segments: TranscriptSegment[] = result.chunks.map((chunk, index) => ({
-        id: `segment-${index}`,
-        start: chunk.start,
-        end: chunk.end,
-        text: chunk.text,
-        speaker: chunk.speaker,
-    }));
-
-    return {
-        segments,
-        fullText: result.text,
-    };
-}
 
 export const transcriptsRouter = createTRPCRouter({
     get: protectedProcedure
@@ -71,11 +57,7 @@ export const transcriptsRouter = createTRPCRouter({
                 };
             }
 
-            const parsed = transcriptionModelSchema.safeParse(
-                ctx.session.user.transcriptionModel,
-            );
-            const model = parsed.success ? parsed.data : DEFAULT_MODEL;
-
+            const settings = buildSettings(ctx.session.user);
             const startedAt = new Date();
 
             if (existing) {
@@ -84,7 +66,7 @@ export const transcriptsRouter = createTRPCRouter({
                     .set({
                         status: "processing",
                         error: null,
-                        model,
+                        model: settings.transcriptionModel,
                         startedAt,
                     })
                     .where(eq(transcripts.id, existing.id));
@@ -92,7 +74,7 @@ export const transcriptsRouter = createTRPCRouter({
                 await ctx.db.insert(transcripts).values({
                     sourceId: input.sourceId,
                     status: "processing",
-                    model,
+                    model: settings.transcriptionModel,
                     startedAt,
                 });
             }
@@ -101,7 +83,7 @@ export const transcriptsRouter = createTRPCRouter({
                 ctx.db,
                 input.sourceId,
                 source.url,
-                model,
+                settings,
                 source.duration,
             );
 
@@ -143,10 +125,7 @@ export const transcriptsRouter = createTRPCRouter({
                 where: eq(transcripts.sourceId, input.sourceId),
             });
 
-            const parsed = transcriptionModelSchema.safeParse(
-                ctx.session.user.transcriptionModel,
-            );
-            const model = parsed.success ? parsed.data : DEFAULT_MODEL;
+            const settings = buildSettings(ctx.session.user);
             const startedAt = new Date();
 
             if (existing) {
@@ -155,7 +134,7 @@ export const transcriptsRouter = createTRPCRouter({
                     .set({
                         status: "processing",
                         error: null,
-                        model,
+                        model: settings.transcriptionModel,
                         startedAt,
                     })
                     .where(eq(transcripts.id, existing.id));
@@ -163,7 +142,7 @@ export const transcriptsRouter = createTRPCRouter({
                 await ctx.db.insert(transcripts).values({
                     sourceId: input.sourceId,
                     status: "processing",
-                    model,
+                    model: settings.transcriptionModel,
                     startedAt,
                 });
             }
@@ -172,7 +151,7 @@ export const transcriptsRouter = createTRPCRouter({
                 ctx.db,
                 input.sourceId,
                 source.url,
-                model,
+                settings,
                 source.duration,
             );
 
@@ -261,10 +240,10 @@ export async function processTranscription(
     database: typeof db,
     sourceId: string,
     audioUrl: string,
-    model: TranscriptionModel,
+    settings: Settings,
     durationSeconds: number,
 ) {
-    const result = await transcribe(audioUrl, model, durationSeconds);
+    const result = await transcribe(audioUrl, settings, durationSeconds);
 
     const transcriptExists = await database.query.transcripts.findFirst({
         where: eq(transcripts.sourceId, sourceId),
@@ -274,7 +253,10 @@ export async function processTranscription(
     if (!transcriptExists) return;
 
     if (result.success) {
-        void trackEvent({ name: "transcription", props: { model } });
+        void trackEvent({
+            name: "transcription",
+            props: { model: settings.transcriptionModel },
+        });
 
         const transcript = toTranscript(result.data);
         const collapsed = collapseConsecutiveSpeakers(transcript);
@@ -305,4 +287,31 @@ export async function processTranscription(
                 .where(eq(transcripts.sourceId, sourceId)),
         );
     }
+}
+
+function toTranscript(result: TranscriptionResult): Transcript {
+    const segments: TranscriptSegment[] = result.chunks.map((chunk, index) => ({
+        id: `segment-${index}`,
+        start: chunk.start,
+        end: chunk.end,
+        text: chunk.text,
+        speaker: chunk.speaker,
+    }));
+
+    return {
+        segments,
+        fullText: result.text,
+    };
+}
+
+function buildSettings(user: User): Settings {
+    const parsed = transcriptionModelSchema.safeParse(user.transcriptionModel);
+    return {
+        role: user.role,
+        transcriptionModel: parsed.success ? parsed.data : DEFAULT_MODEL,
+        autoTranscribe: user.autoTranscribe,
+        showTimestamps: user.showTimestamps,
+        showSpeakers: user.showSpeakers,
+        removeFillwords: user.removeFillwords,
+    };
 }

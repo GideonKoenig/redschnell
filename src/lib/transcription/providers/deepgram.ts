@@ -12,11 +12,11 @@ const client = createClient(env.DEEPGRAM_KEY);
 
 export const transcribeDeepgram: TranscribeFunction = async (
     audioUrl,
-    model,
+    settings,
     supportsDiarization,
     _durationSeconds,
 ) => {
-    const modelId = TRANSCRIPTION_MODELS[model].modelId;
+    const modelId = TRANSCRIPTION_MODELS[settings.transcriptionModel].modelId;
 
     const result = await tryCatch(
         client.listen.prerecorded.transcribeUrl(
@@ -28,6 +28,7 @@ export const transcribeDeepgram: TranscribeFunction = async (
                 diarize: supportsDiarization,
                 punctuate: true,
                 utterances: true,
+                filler_words: !settings.removeFillwords,
             },
         ),
     );
@@ -97,7 +98,10 @@ export const transcribeDeepgram: TranscribeFunction = async (
     }
 
     const durationSeconds = response.metadata.duration;
-    const priceUsd = calculatePrice(durationSeconds, model);
+    const priceUsd = calculatePrice(
+        durationSeconds,
+        settings.transcriptionModel,
+    );
 
     return new Success({
         text: alternative.transcript,

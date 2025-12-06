@@ -34,6 +34,10 @@ export const auth = betterAuth({
                 type: "boolean",
                 defaultValue: true,
             },
+            removeFillwords: {
+                type: "boolean",
+                defaultValue: false,
+            },
         },
     },
     socialProviders: {

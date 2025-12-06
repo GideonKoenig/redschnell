@@ -34,12 +34,12 @@ function normalizeResponse(response: FalWhisperResponse): TranscriptionResult {
 
 export const transcribeFal: TranscribeFunction = async (
     audioUrl,
-    model,
+    settings,
     supportsDiarization,
     durationSeconds,
 ) => {
     const result = await tryCatch(
-        fal.subscribe(model, {
+        fal.subscribe(settings.transcriptionModel, {
             input: {
                 audio_url: audioUrl,
                 task: "transcribe",
@@ -52,7 +52,10 @@ export const transcribeFal: TranscribeFunction = async (
     if (!result.success) return result;
 
     const data = result.data.data as FalWhisperResponse;
-    const priceUsd = calculatePrice(durationSeconds, model);
+    const priceUsd = calculatePrice(
+        durationSeconds,
+        settings.transcriptionModel,
+    );
 
     return new Success({
         ...normalizeResponse(data),

@@ -13,6 +13,7 @@ export const settingsRouter = createTRPCRouter({
                 transcriptionModel: true,
                 showTimestamps: true,
                 showSpeakers: true,
+                removeFillwords: true,
             },
         });
 

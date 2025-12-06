@@ -6,9 +6,9 @@ import { useUploadProgress } from "~/components/providers/upload-progress-provid
 import { SourceCard } from "~/components/source/source-card";
 import { UploadItemCard } from "~/components/source/upload-item-card";
 import { Button } from "~/components/ui/button";
+import { InfoTooltip } from "~/components/ui/info-tooltip";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Switch } from "~/components/ui/switch";
-import { type TranscriptionModel } from "~/lib/transcription-models";
 import { api } from "~/trpc/react";
 
 export function Sidebar(props: {
@@ -109,7 +109,10 @@ export function Sidebar(props: {
                             <Loader2 className="text-text-muted ml-auto size-3.5 animate-spin" />
                         )}
                     </div>
-                    <SettingRow label="Auto transcribe">
+                    <SettingRow
+                        label="Auto transcribe"
+                        description="Automatically start transcription when a file is uploaded"
+                    >
                         <Switch
                             checked={settings.autoTranscribe}
                             onCheckedChange={(v) =>
@@ -117,7 +120,10 @@ export function Sidebar(props: {
                             }
                         />
                     </SettingRow>
-                    <SettingRow label="Show timestamps">
+                    <SettingRow
+                        label="Show timestamps"
+                        description="Display timestamps for each segment in the transcript"
+                    >
                         <Switch
                             checked={settings.showTimestamps}
                             onCheckedChange={(v) =>
@@ -125,13 +131,30 @@ export function Sidebar(props: {
                             }
                         />
                     </SettingRow>
-                    <SettingRow label="Show speakers">
+                    <SettingRow
+                        label="Show speakers"
+                        description="Display speaker labels when speaker detection is available"
+                    >
                         <Switch
                             checked={settings.showSpeakers}
                             onCheckedChange={(v) => update({ showSpeakers: v })}
                         />
                     </SettingRow>
-                    <SettingRow label="Model">
+                    <SettingRow
+                        label="Remove fillwords"
+                        description="Remove filler words like 'um', 'uh' from transcripts (Deepgram only)"
+                    >
+                        <Switch
+                            checked={settings.removeFillwords}
+                            onCheckedChange={(v) =>
+                                update({ removeFillwords: v })
+                            }
+                        />
+                    </SettingRow>
+                    <SettingRow
+                        label="Model"
+                        description="The AI model used for speech-to-text transcription"
+                    >
                         <ModelPicker
                             value={settings.transcriptionModel}
                             onChange={(v) => update({ transcriptionModel: v })}
@@ -143,10 +166,17 @@ export function Sidebar(props: {
     );
 }
 
-function SettingRow(props: { label: string; children: React.ReactNode }) {
+function SettingRow(props: {
+    label: string;
+    description: string;
+    children: React.ReactNode;
+}) {
     return (
         <div className="flex items-center justify-between pl-6">
-            <span className="text-text-muted text-sm">{props.label}</span>
+            <span className="text-text-muted flex items-center gap-1.5 text-sm">
+                {props.label}
+                <InfoTooltip content={props.description} />
+            </span>
             {props.children}
         </div>
     );

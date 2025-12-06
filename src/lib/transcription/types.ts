@@ -1,4 +1,4 @@
-import { type TranscriptionModel } from "~/lib/transcription-models";
+import { type Settings } from "~/lib/settings";
 import { type Result } from "~/lib/try-catch";
 
 export type TranscriptionChunk = {
@@ -22,7 +22,7 @@ export type TranscriptionProvider = "fal" | "deepgram";
 
 export type TranscribeFunction = (
     audioUrl: string,
-    model: TranscriptionModel,
+    settings: Settings,
     supportsDiarization: boolean,
     durationSeconds: number,
 ) => Promise<Result<TranscriptionResult>>;

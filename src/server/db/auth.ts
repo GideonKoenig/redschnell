@@ -33,6 +33,7 @@ export const user = createTable(
             .default("deepgram/nova-3"),
         showTimestamps: boolean("show_timestamps").notNull().default(true),
         showSpeakers: boolean("show_speakers").notNull().default(true),
+        removeFillwords: boolean("remove_fillwords").notNull().default(false),
         createdAt: timestamp("created_at").notNull().defaultNow(),
         updatedAt: timestamp("updated_at").notNull().defaultNow(),
     },
