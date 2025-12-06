@@ -1,10 +1,6 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
-import { getSession } from "~/lib/auth-server";
-import {
-    DEFAULT_MODEL,
-    transcriptionModelSchema,
-} from "~/lib/transcription-models";
+import { buildSettings, getSession } from "~/lib/auth-server";
 import { processTranscription } from "~/server/api/routers/transcripts";
 import { db } from "~/server/db";
 import { sources, transcripts } from "~/server/db/schema";
@@ -18,11 +14,7 @@ export const ourFileRouter = {
         .middleware(async () => {
             const session = await getSession();
             if (!session) throw new UploadThingError("Unauthorized") as Error;
-            return {
-                userId: session.user.id,
-                autoTranscribe: session.user.autoTranscribe,
-                transcriptionModel: session.user.transcriptionModel,
-            };
+            return { user: session.user };
         })
         .onUploadComplete(async ({ metadata, file }) => {
             const fileSize = file.size;
@@ -35,28 +27,25 @@ export const ourFileRouter = {
                     url: file.ufsUrl,
                     fileSize,
                     duration,
-                    owner: metadata.userId,
+                    owner: metadata.user.id,
                 })
                 .returning({ id: sources.id });
 
             if (!source) return { sourceId: undefined };
 
-            if (metadata.autoTranscribe) {
-                const parsed = transcriptionModelSchema.safeParse(
-                    metadata.transcriptionModel,
-                );
-                const model = parsed.success ? parsed.data : DEFAULT_MODEL;
+            if (metadata.user.autoTranscribe) {
+                const settings = buildSettings(metadata.user);
                 await db.insert(transcripts).values({
                     sourceId: source.id,
                     status: "processing",
-                    model,
+                    model: settings.transcriptionModel,
                     startedAt: new Date(),
                 });
                 void processTranscription(
                     db,
                     source.id,
                     file.ufsUrl,
-                    model,
+                    settings,
                     duration,
                 );
             }

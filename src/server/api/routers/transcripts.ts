@@ -6,12 +6,8 @@ import {
     type Transcript,
     type TranscriptSegment,
 } from "~/lib/schemas/transcript";
-import { type User } from "~/lib/auth-server";
+import { buildSettings } from "~/lib/auth-server";
 import { type Settings } from "~/lib/settings";
-import {
-    DEFAULT_MODEL,
-    transcriptionModelSchema,
-} from "~/lib/transcription-models";
 import { transcribe, type TranscriptionResult } from "~/lib/transcription";
 import { trackEvent } from "~/lib/plausible";
 import { newError, tryCatch } from "~/lib/try-catch";
@@ -301,17 +297,5 @@ function toTranscript(result: TranscriptionResult): Transcript {
     return {
         segments,
         fullText: result.text,
-    };
-}
-
-function buildSettings(user: User): Settings {
-    const parsed = transcriptionModelSchema.safeParse(user.transcriptionModel);
-    return {
-        role: user.role,
-        transcriptionModel: parsed.success ? parsed.data : DEFAULT_MODEL,
-        autoTranscribe: user.autoTranscribe,
-        showTimestamps: user.showTimestamps,
-        showSpeakers: user.showSpeakers,
-        removeFillwords: user.removeFillwords,
     };
 }

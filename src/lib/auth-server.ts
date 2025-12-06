@@ -4,7 +4,11 @@ import { headers } from "next/headers";
 import { db } from "~/server/db";
 import * as schema from "~/server/db/schema";
 import { env } from "~/env";
-import { DEFAULT_MODEL } from "~/lib/transcription-models";
+import { type Settings } from "~/lib/settings";
+import {
+    DEFAULT_MODEL,
+    transcriptionModelSchema,
+} from "~/lib/transcription-models";
 
 export const auth = betterAuth({
     secret: env.BETTER_AUTH_SECRET,
@@ -62,4 +66,16 @@ export async function getSession() {
 export async function getUser() {
     const session = await getSession();
     return session?.user ?? null;
+}
+
+export function buildSettings(user: User): Settings {
+    const parsed = transcriptionModelSchema.safeParse(user.transcriptionModel);
+    return {
+        role: user.role,
+        transcriptionModel: parsed.success ? parsed.data : DEFAULT_MODEL,
+        autoTranscribe: user.autoTranscribe,
+        showTimestamps: user.showTimestamps,
+        showSpeakers: user.showSpeakers,
+        removeFillwords: user.removeFillwords,
+    };
 }
