@@ -25,7 +25,7 @@ export const user = createTable(
         name: varchar("name", { length: 255 }),
         email: varchar("email", { length: 255 }).notNull().unique(),
         emailVerified: boolean("email_verified").notNull().default(false),
-        image: varchar("image", { length: 255 }),
+        image: text("image"),
         role: userRoleEnum("role").notNull().default("free"),
         autoTranscribe: boolean("auto_transcribe").notNull().default(false),
         transcriptionModel: transcriptionModelEnum("transcription_model")
@@ -54,7 +54,7 @@ export const session = createTable(
         userId: varchar("user_id", { length: 255 })
             .notNull()
             .references(() => user.id),
-        token: varchar("token", { length: 255 }).notNull().unique(),
+        token: text("token").notNull().unique(),
         expiresAt: timestamp("expires_at").notNull(),
         ipAddress: text("ip_address"),
         userAgent: text("user_agent"),
@@ -78,7 +78,7 @@ export const account = createTable(
         userId: varchar("user_id", { length: 255 })
             .notNull()
             .references(() => user.id),
-        accountId: varchar("account_id", { length: 255 }).notNull(),
+        accountId: text("account_id").notNull(),
         providerId: varchar("provider_id", { length: 255 }).notNull(),
         accessToken: text("access_token"),
         refreshToken: text("refresh_token"),
@@ -104,7 +104,7 @@ export const verification = createTable(
     {
         id: varchar("id", { length: 255 }).notNull().primaryKey(),
         identifier: varchar("identifier", { length: 255 }).notNull(),
-        value: varchar("value", { length: 255 }).notNull(),
+        value: text("value").notNull(),
         expiresAt: timestamp("expires_at").notNull(),
         createdAt: timestamp("created_at").notNull().defaultNow(),
         updatedAt: timestamp("updated_at").notNull().defaultNow(),
