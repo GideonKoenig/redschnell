@@ -57,7 +57,7 @@ export function Sidebar(props: {
     const update = updateSettings.mutate;
 
     return (
-        <aside className="bg-bg-surface border-border flex h-full flex-col rounded-lg border shadow-sm">
+        <aside className="bg-bg-surface border-border flex h-full w-full min-w-0 flex-col rounded-lg border shadow-sm">
             <div className="border-border flex items-center justify-between border-b p-3">
                 <h1 className="text-text text-lg font-semibold">Sources</h1>
                 <Button
@@ -70,7 +70,7 @@ export function Sidebar(props: {
                 </Button>
             </div>
 
-            <ScrollArea className="flex-1">
+            <ScrollArea className="min-w-0 grow">
                 <div className="flex flex-col gap-1 p-2">
                     {uploadList.map((upload) => (
                         <UploadItemCard

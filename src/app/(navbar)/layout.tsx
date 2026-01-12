@@ -8,7 +8,7 @@ export default function NavbarLayout({
         <ScrollArea className="h-dvh w-full">
             <div className="flex h-full min-h-dvh flex-col">
                 <NavigationBar className="bg-bg-surface" />
-                <div className="min-h-0 grow">{children}</div>
+                <div className="flex min-h-0 grow flex-col">{children}</div>
             </div>
         </ScrollArea>
     );

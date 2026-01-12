@@ -64,7 +64,7 @@ export function SourceCard(props: { source: SourceWithTranscript }) {
                 className="hover:bg-bg-muted data-[active=true]:bg-bg-muted flex items-center gap-2 rounded-md p-2 pr-8 data-[deleting=true]:opacity-50"
             >
                 {statusIndicator}
-                <span className="text-text flex-1 truncate text-sm">
+                <span className="text-text truncate text-sm">
                     {props.source.name}
                 </span>
             </Link>
@@ -72,7 +72,7 @@ export function SourceCard(props: { source: SourceWithTranscript }) {
             {!isDeleting && (
                 <button
                     onClick={handleDelete}
-                    className="text-text-muted hover:text-error absolute top-1/2 right-1 hidden -translate-y-1/2 rounded p-1 group-hover:block"
+                    className="text-text-muted hover:text-error absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 opacity-0 group-hover:opacity-100"
                 >
                     <Trash2 className="size-4" />
                 </button>

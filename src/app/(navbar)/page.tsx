@@ -3,7 +3,7 @@ import { Button } from "~/components/ui/button";
 
 export default function Home() {
     return (
-        <main className="flex h-full w-full flex-col items-center justify-center">
+        <main className="flex w-full grow flex-col items-center justify-center">
             <div className="flex flex-col gap-10">
                 <h1 className="text-6xl font-black drop-shadow-lg">
                     Transcriptions but{" "}
