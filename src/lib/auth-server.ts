@@ -61,7 +61,7 @@ export type Session = typeof auth.$Infer.Session;
 export type User = typeof auth.$Infer.Session.user;
 
 export async function getSession() {
-    return auth.api.getSession({ headers: headers() });
+    return auth.api.getSession({ headers: await headers() });
 }
 
 export async function getUser() {
