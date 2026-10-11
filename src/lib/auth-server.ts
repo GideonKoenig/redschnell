@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { admin } from "better-auth/plugins";
 import { headers } from "next/headers";
 import { db } from "~/server/db";
 import * as schema from "~/server/db/schema";
@@ -20,8 +21,9 @@ export const auth = betterAuth({
     user: {
         additionalFields: {
             role: {
-                type: "string",
+                type: schema.userRoleEnum.enumValues,
                 defaultValue: "free",
+                // Users can't set their own role. "admin" grants surrogation.
                 input: false,
             },
             autoTranscribe: {
@@ -56,6 +58,8 @@ export const auth = betterAuth({
         expiresIn: 60 * 60 * 24 * 7,
         updateAge: 60 * 60 * 24,
     },
+    // Admins can surrogate other users for one hour. The session then belongs to the target user.
+    plugins: [admin({ defaultRole: "free" })],
 });
 
 export type Session = typeof auth.$Infer.Session;

@@ -1,5 +1,6 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
+import { z } from "zod";
 import { buildSettings, getSession } from "~/lib/auth-server";
 import { processTranscription } from "~/server/api/routers/transcripts";
 import { db } from "~/server/db";
@@ -11,9 +12,12 @@ export const ourFileRouter = {
     uploader: f({
         audio: { maxFileSize: "512MB", maxFileCount: 100 },
     })
-        .middleware(async () => {
+        // Conversion runs for minutes in the browser. If another tab switched accounts meanwhile, the file must not land in the new account.
+        .input(z.object({ userId: z.string() }))
+        .middleware(async ({ input }) => {
             const session = await getSession();
-            if (!session) throw new UploadThingError("Unauthorized") as Error;
+            if (session?.user.id !== input.userId)
+                throw new UploadThingError("Unauthorized") as Error;
             return { user: session.user };
         })
         .onUploadComplete(async ({ metadata, file }) => {
