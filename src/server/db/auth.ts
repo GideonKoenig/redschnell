@@ -37,9 +37,7 @@ export const user = createTable(
         createdAt: timestamp("created_at").notNull().defaultNow(),
         updatedAt: timestamp("updated_at").notNull().defaultNow(),
     },
-    (u) => ({
-        emailIdx: index("user_email_idx").on(u.email),
-    }),
+    (u) => [index("user_email_idx").on(u.email)],
 );
 
 export const userRelations = relations(user, ({ many }) => ({
@@ -61,10 +59,10 @@ export const session = createTable(
         createdAt: timestamp("created_at").notNull().defaultNow(),
         updatedAt: timestamp("updated_at").notNull().defaultNow(),
     },
-    (s) => ({
-        userIdIdx: index("session_user_id_idx").on(s.userId),
-        tokenIdx: index("session_token_idx").on(s.token),
-    }),
+    (s) => [
+        index("session_user_id_idx").on(s.userId),
+        index("session_token_idx").on(s.token),
+    ],
 );
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -90,9 +88,7 @@ export const account = createTable(
         createdAt: timestamp("created_at").notNull().defaultNow(),
         updatedAt: timestamp("updated_at").notNull().defaultNow(),
     },
-    (a) => ({
-        userIdIdx: index("account_user_id_idx").on(a.userId),
-    }),
+    (a) => [index("account_user_id_idx").on(a.userId)],
 );
 
 export const accountRelations = relations(account, ({ one }) => ({
@@ -109,7 +105,5 @@ export const verification = createTable(
         createdAt: timestamp("created_at").notNull().defaultNow(),
         updatedAt: timestamp("updated_at").notNull().defaultNow(),
     },
-    (v) => ({
-        identifierIdx: index("verification_identifier_idx").on(v.identifier),
-    }),
+    (v) => [index("verification_identifier_idx").on(v.identifier)],
 );
