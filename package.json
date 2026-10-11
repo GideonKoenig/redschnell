@@ -44,7 +44,7 @@
         "geist": "^1.7.2",
         "lucide-react": "^1.55.0",
         "next": "16.4.3",
-        "next-plausible": "^3.12.5",
+        "next-plausible": "^4.0.0",
         "next-sitemap": "^4.2.3",
         "postgres": "^3.4.9",
         "react": "^19.3.0",
