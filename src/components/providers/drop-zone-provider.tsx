@@ -27,27 +27,20 @@ export function useDropZone() {
 }
 
 export function DropZoneProvider(props: { children: ReactNode }) {
-    const [isDragging, setIsDragging] = useState(false);
-    const [dragCounter, setDragCounter] = useState(0);
+    // dragenter/dragleave also fire for child elements, so count nesting depth.
+    const [dragDepth, setDragDepth] = useState(0);
+    const isDragging = dragDepth > 0;
 
     const onDragEnter = (e: DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        setDragCounter((prev) => {
-            const next = prev + 1;
-            if (next === 1) setIsDragging(true);
-            return next;
-        });
+        setDragDepth((depth) => depth + 1);
     };
 
     const onDragLeave = (e: DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        setDragCounter((prev) => {
-            const next = prev - 1;
-            if (next === 0) setIsDragging(false);
-            return next;
-        });
+        setDragDepth((depth) => Math.max(0, depth - 1));
     };
 
     const onDragOver = (e: DragEvent) => {
@@ -58,8 +51,7 @@ export function DropZoneProvider(props: { children: ReactNode }) {
     const onDrop = (e: DragEvent, handler: (files: File[]) => void) => {
         e.preventDefault();
         e.stopPropagation();
-        setDragCounter(0);
-        setIsDragging(false);
+        setDragDepth(0);
 
         const files = Array.from(e.dataTransfer.files).filter(
             (file) =>
