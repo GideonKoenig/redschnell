@@ -39,10 +39,10 @@ export const sources = createTable(
             .default(sql`CURRENT_TIMESTAMP`)
             .notNull(),
     },
-    (source) => ({
-        idIdx: index("source_id_idx").on(source.id),
-        ownerIdx: index("source_owner_idx").on(source.owner),
-    }),
+    (source) => [
+        index("source_id_idx").on(source.id),
+        index("source_owner_idx").on(source.owner),
+    ],
 );
 
 export const sourcesRelations = relations(sources, ({ one }) => ({
@@ -77,10 +77,10 @@ export const transcripts = createTable(
         startedAt: timestamp("started_at", { withTimezone: true }),
         completedAt: timestamp("completed_at", { withTimezone: true }),
     },
-    (transcript) => ({
-        idIdx: index("transcript_id_idx").on(transcript.id),
-        sourceIdIdx: index("transcript_source_id_idx").on(transcript.sourceId),
-    }),
+    (transcript) => [
+        index("transcript_id_idx").on(transcript.id),
+        index("transcript_source_id_idx").on(transcript.sourceId),
+    ],
 );
 
 export const transcriptsRelations = relations(transcripts, ({ one }) => ({

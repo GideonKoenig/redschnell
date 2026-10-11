@@ -1,65 +1,48 @@
-import { FlatCompat } from "@eslint/eslintrc";
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
 import tseslint from "typescript-eslint";
 import drizzle from "eslint-plugin-drizzle";
 
-const compat = new FlatCompat({
-    baseDirectory: import.meta.dirname,
-});
-
-export default tseslint.config(
+export default defineConfig([
+    ...nextVitals,
     {
-        ignores: [".next/", "node_modules/", "next.config.js"],
-    },
-    ...compat.extends("next/core-web-vitals"),
-    ...tseslint.configs.recommendedTypeChecked,
-    ...tseslint.configs.stylisticTypeChecked,
-    {
+        files: ["**/*.{ts,tsx}", "src/**/*.js"],
+        extends: [
+            ...tseslint.configs.recommendedTypeChecked,
+            ...tseslint.configs.stylisticTypeChecked,
+        ],
         languageOptions: {
             parserOptions: {
                 projectService: true,
                 tsconfigRootDir: import.meta.dirname,
             },
         },
-        plugins: {
-            drizzle,
-        },
+        plugins: { drizzle },
         rules: {
             "@typescript-eslint/array-type": "off",
             "@typescript-eslint/consistent-type-definitions": "off",
             "@typescript-eslint/consistent-type-imports": [
                 "warn",
-                {
-                    prefer: "type-imports",
-                    fixStyle: "inline-type-imports",
-                },
+                { prefer: "type-imports", fixStyle: "inline-type-imports" },
             ],
             "@typescript-eslint/no-unused-vars": [
                 "warn",
-                {
-                    argsIgnorePattern: "^_",
-                },
+                { argsIgnorePattern: "^_" },
             ],
             "@typescript-eslint/require-await": "off",
             "@typescript-eslint/no-misused-promises": [
                 "error",
-                {
-                    checksVoidReturn: {
-                        attributes: false,
-                    },
-                },
+                { checksVoidReturn: { attributes: false } },
             ],
             "drizzle/enforce-delete-with-where": [
                 "error",
-                {
-                    drizzleObjectName: ["db", "ctx.db"],
-                },
+                { drizzleObjectName: ["db", "ctx.db"] },
             ],
             "drizzle/enforce-update-with-where": [
                 "error",
-                {
-                    drizzleObjectName: ["db", "ctx.db"],
-                },
+                { drizzleObjectName: ["db", "ctx.db"] },
             ],
         },
     },
-);
+    globalIgnores(["public/**"]),
+]);

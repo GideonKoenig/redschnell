@@ -4,6 +4,7 @@ await import("./src/env.js");
 
 /** @type {import('next').NextConfig} */
 const config = {
+    reactCompiler: true,
     headers: async () => [
         {
             source: "/((?!api).*)",
@@ -16,13 +17,6 @@ const config = {
             ],
         },
     ],
-    webpack: (config) => {
-        config.experiments = {
-            ...config.experiments,
-            asyncWebAssembly: true,
-        };
-        return config;
-    },
 };
 
 export default withPlausibleProxy({
