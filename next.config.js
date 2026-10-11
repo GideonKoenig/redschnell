@@ -20,5 +20,5 @@ const config = {
 };
 
 export default withPlausibleProxy({
-    customDomain: "https://plausible.gko.gg",
+    src: "https://plausible.gko.gg/js/pa-Vj9FwXfsMAGe5WSM-lzKs.js",
 })(config);

@@ -24,14 +24,13 @@ export default async function RootLayout({
             suppressHydrationWarning
             className={`${GeistSans.variable}`}
         >
-            <head>
-                <PlausibleProvider domain="redschnell.gko.gg" selfHosted />
-            </head>
             <body className="h-screen w-screen bg-bg-base text-text">
-                <UTNextSSRPlugin
-                    routerConfig={extractRouterConfig(ourFileRouter)}
-                />
-                <TRPCReactProvider>{children}</TRPCReactProvider>
+                <PlausibleProvider>
+                    <UTNextSSRPlugin
+                        routerConfig={extractRouterConfig(ourFileRouter)}
+                    />
+                    <TRPCReactProvider>{children}</TRPCReactProvider>
+                </PlausibleProvider>
             </body>
         </html>
     );
