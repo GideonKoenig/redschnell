@@ -34,6 +34,10 @@ export const user = createTable(
         showTimestamps: boolean("show_timestamps").notNull().default(true),
         showSpeakers: boolean("show_speakers").notNull().default(true),
         removeFillwords: boolean("remove_fillwords").notNull().default(false),
+        // Required by the better-auth admin plugin. The app does not ban users.
+        banned: boolean("banned").default(false),
+        banReason: text("ban_reason"),
+        banExpires: timestamp("ban_expires"),
         createdAt: timestamp("created_at").notNull().defaultNow(),
         updatedAt: timestamp("updated_at").notNull().defaultNow(),
     },
@@ -56,6 +60,8 @@ export const session = createTable(
         expiresAt: timestamp("expires_at").notNull(),
         ipAddress: text("ip_address"),
         userAgent: text("user_agent"),
+        // Set on surrogate sessions to the admin who started them.
+        impersonatedBy: text("impersonated_by"),
         createdAt: timestamp("created_at").notNull().defaultNow(),
         updatedAt: timestamp("updated_at").notNull().defaultNow(),
     },

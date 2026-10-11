@@ -14,11 +14,16 @@ export default async function AppLayout({
     if (!session) redirect("/sign-in");
 
     return (
-            <UploadProgressProvider>
+        <UploadProgressProvider>
             <DropZoneProvider>
-                <AppShell>{children}</AppShell>
+                <AppShell
+                    user={session.user}
+                    surrogate={Boolean(session.session.impersonatedBy)}
+                >
+                    {children}
+                </AppShell>
                 <Toaster position="bottom-right" />
             </DropZoneProvider>
-            </UploadProgressProvider>
+        </UploadProgressProvider>
     );
 }

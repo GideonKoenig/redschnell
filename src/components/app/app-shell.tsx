@@ -5,12 +5,19 @@ import { type ReactNode, useRef } from "react";
 import { useDropZone } from "~/components/providers/drop-zone-provider";
 import { Sidebar } from "~/components/app/sidebar";
 import { useUploader } from "~/hooks/use-uploader";
+import { useReloadOnAccountSwitch } from "~/lib/auth-client";
+import { type User } from "~/lib/auth-server";
 
-export function AppShell(props: { children: ReactNode }) {
+export function AppShell(props: {
+    user: User;
+    surrogate: boolean;
+    children: ReactNode;
+}) {
     const { isDragging, onDragEnter, onDragLeave, onDragOver, onDrop } =
         useDropZone();
-    const { uploadFiles, cancelUpload } = useUploader();
+    const { uploadFiles, cancelUpload } = useUploader(props.user.id);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    useReloadOnAccountSwitch();
 
     const handleDrop = (e: React.DragEvent) => {
         onDrop(e, (files) => {
@@ -52,6 +59,8 @@ export function AppShell(props: { children: ReactNode }) {
             <div className="mx-auto h-full max-w-5xl">
                 <div className="grid h-full grid-cols-[20rem_1fr] gap-3">
                     <Sidebar
+                        user={props.user}
+                        surrogate={props.surrogate}
                         onUploadClick={openFilePicker}
                         onCancelUpload={cancelUpload}
                     />

@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2, Plus, Settings } from "lucide-react";
+import { AccountBar } from "~/components/app/account-bar";
 import { ModelPicker } from "~/components/app/model-picker";
 import { useUploadProgress } from "~/components/providers/upload-progress-provider";
 import { SourceCard } from "~/components/source/source-card";
@@ -9,9 +10,12 @@ import { Button } from "~/components/ui/button";
 import { InfoTooltip } from "~/components/ui/info-tooltip";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Switch } from "~/components/ui/switch";
+import { type User } from "~/lib/auth-server";
 import { api } from "~/trpc/react";
 
 export function Sidebar(props: {
+    user: User;
+    surrogate: boolean;
     onUploadClick: () => void;
     onCancelUpload: (id: string) => void;
 }) {
@@ -162,6 +166,8 @@ export function Sidebar(props: {
                     </SettingRow>
                 </div>
             )}
+
+            <AccountBar user={props.user} surrogate={props.surrogate} />
         </aside>
     );
 }

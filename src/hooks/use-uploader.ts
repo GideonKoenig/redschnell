@@ -10,7 +10,8 @@ import { api } from "~/trpc/react";
 
 const { uploadFiles: uploadFilesUT } = generateReactHelpers<OurFileRouter>();
 
-export function useUploader() {
+/** Converts and uploads files for the given user. The server rejects the upload if the session changed accounts meanwhile. */
+export function useUploader(userId: string) {
     const { uploads, addUpload, updateUpload, dismissUpload } =
         useUploadProgress();
     const utils = api.useUtils();
@@ -75,6 +76,7 @@ export function useUploader() {
         const uploadResult = await tryCatch(
             uploadFilesUT("uploader", {
                 files: [convertResult.data],
+                input: { userId },
                 signal: controller.signal,
                 onUploadProgress: ({ progress }) => {
                     updateUpload(id, { phase: "uploading", progress });
