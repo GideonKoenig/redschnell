@@ -41,7 +41,7 @@ export function AppShell(props: {
 
     return (
         <div
-            className="bg-bg-base h-dvh w-dvw p-3"
+            className="h-dvh w-dvw bg-bg-base p-3"
             onDragEnter={onDragEnter}
             onDragLeave={onDragLeave}
             onDragOver={onDragOver}
@@ -65,20 +65,20 @@ export function AppShell(props: {
                         onCancelUpload={cancelUpload}
                     />
 
-                    <main className="bg-bg-surface border-border relative h-full overflow-hidden rounded-lg border shadow-sm">
+                    <main className="relative h-full overflow-hidden rounded-lg border border-border bg-bg-surface shadow-sm">
                         {props.children}
                     </main>
                 </div>
             </div>
 
             {isDragging && (
-                <div className="bg-accent/5 border-accent pointer-events-none fixed inset-3 z-50 flex items-center justify-center rounded-lg border-2 border-dashed">
-                    <div className="bg-bg-surface flex flex-col items-center gap-3 rounded-lg p-8 shadow-lg">
-                        <Upload className="text-accent size-12" />
-                        <p className="text-text text-lg font-medium">
+                <div className="pointer-events-none fixed inset-3 z-50 flex items-center justify-center rounded-lg border-2 border-dashed border-accent bg-accent/5">
+                    <div className="flex flex-col items-center gap-3 rounded-lg bg-bg-surface p-8 shadow-lg">
+                        <Upload className="size-12 text-accent" />
+                        <p className="text-lg font-medium text-text">
                             Drop files to upload
                         </p>
-                        <p className="text-text-muted text-sm">
+                        <p className="text-sm text-text-muted">
                             Audio and video files supported
                         </p>
                     </div>

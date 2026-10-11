@@ -4,10 +4,10 @@ import { signIn } from "~/lib/auth-client";
 
 export default function SignIn() {
     return (
-        <div className="bg-bg-base flex h-screen w-screen flex-col items-center justify-center">
-            <div className="bg-bg-surface border-border flex flex-col items-center gap-6 rounded-lg border p-8 shadow">
-                <h1 className="text-text text-2xl font-bold">Sign In</h1>
-                <p className="text-text-muted text-sm">
+        <div className="flex h-screen w-screen flex-col items-center justify-center bg-bg-base">
+            <div className="flex flex-col items-center gap-6 rounded-lg border border-border bg-bg-surface p-8 shadow">
+                <h1 className="text-2xl font-bold text-text">Sign In</h1>
+                <p className="text-sm text-text-muted">
                     Sign in to access your transcriptions
                 </p>
 

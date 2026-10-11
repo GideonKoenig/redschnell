@@ -36,16 +36,16 @@ export function UploadItemCard(props: {
 
 function QueuedCard(props: { upload: UploadItem; onDismiss: () => void }) {
     return (
-        <div className="bg-bg-muted group rounded-md p-2">
+        <div className="group rounded-md bg-bg-muted p-2">
             <div className="relative flex items-center gap-2">
-                <Clock className="text-text-muted size-4 shrink-0" />
-                <span className="text-text flex-1 truncate text-sm">
+                <Clock className="size-4 shrink-0 text-text-muted" />
+                <span className="flex-1 truncate text-sm text-text">
                     {props.upload.fileName}
                 </span>
                 <DismissButton onDismiss={props.onDismiss} />
             </div>
             <div className="mt-1.5">
-                <span className="text-text-muted text-xs">Queued</span>
+                <span className="text-xs text-text-muted">Queued</span>
             </div>
         </div>
     );
@@ -55,23 +55,23 @@ function ConvertingCard(props: { upload: UploadItem; onDismiss: () => void }) {
     const progress = Math.min(props.upload.progress, 100);
 
     return (
-        <div className="bg-bg-muted group rounded-md p-2">
+        <div className="group rounded-md bg-bg-muted p-2">
             <div className="relative flex items-center gap-2">
-                <Loader2 className="text-warning size-4 shrink-0 animate-spin" />
-                <span className="text-text flex-1 truncate text-sm">
+                <Loader2 className="size-4 shrink-0 animate-spin text-warning" />
+                <span className="flex-1 truncate text-sm text-text">
                     {props.upload.fileName}
                 </span>
                 <DismissButton onDismiss={props.onDismiss} />
             </div>
             <div className="mt-1.5 flex items-center gap-2">
-                <span className="text-warning shrink-0 text-xs">
+                <span className="shrink-0 text-xs text-warning">
                     Converting
                 </span>
                 <Progress
                     value={progress}
-                    className="[&>div]:bg-warning h-1 flex-1"
+                    className="h-1 flex-1 [&>div]:bg-warning"
                 />
-                <span className="text-warning w-8 shrink-0 text-right text-xs">
+                <span className="w-8 shrink-0 text-right text-xs text-warning">
                     {Math.round(progress)}%
                 </span>
             </div>
@@ -83,21 +83,21 @@ function UploadingCard(props: { upload: UploadItem; onDismiss: () => void }) {
     const progress = Math.min(props.upload.progress, 100);
 
     return (
-        <div className="bg-bg-muted group rounded-md p-2">
+        <div className="group rounded-md bg-bg-muted p-2">
             <div className="relative flex items-center gap-2">
-                <Loader2 className="text-accent size-4 shrink-0 animate-spin" />
-                <span className="text-text flex-1 truncate text-sm">
+                <Loader2 className="size-4 shrink-0 animate-spin text-accent" />
+                <span className="flex-1 truncate text-sm text-text">
                     {props.upload.fileName}
                 </span>
                 <DismissButton onDismiss={props.onDismiss} />
             </div>
             <div className="mt-1.5 flex items-center gap-2">
-                <span className="text-accent shrink-0 text-xs">Uploading</span>
+                <span className="shrink-0 text-xs text-accent">Uploading</span>
                 <Progress
                     value={progress}
-                    className="[&>div]:bg-accent h-1 flex-1"
+                    className="h-1 flex-1 [&>div]:bg-accent"
                 />
-                <span className="text-accent w-8 shrink-0 text-right text-xs">
+                <span className="w-8 shrink-0 text-right text-xs text-accent">
                     {Math.round(progress)}%
                 </span>
             </div>
@@ -107,16 +107,16 @@ function UploadingCard(props: { upload: UploadItem; onDismiss: () => void }) {
 
 function ErrorCard(props: { upload: UploadItem; onDismiss: () => void }) {
     return (
-        <div className="bg-bg-muted group rounded-md p-2">
+        <div className="group rounded-md bg-bg-muted p-2">
             <div className="relative flex items-center gap-2">
-                <XCircle className="text-error size-4 shrink-0" />
-                <span className="text-text flex-1 truncate text-sm">
+                <XCircle className="size-4 shrink-0 text-error" />
+                <span className="flex-1 truncate text-sm text-text">
                     {props.upload.fileName}
                 </span>
                 <DismissButton onDismiss={props.onDismiss} />
             </div>
             {props.upload.error && (
-                <p className="text-error mt-1 truncate text-xs">
+                <p className="mt-1 truncate text-xs text-error">
                     {props.upload.error}
                 </p>
             )}
@@ -128,7 +128,7 @@ function DismissButton(props: { onDismiss: () => void }) {
     return (
         <button
             onClick={props.onDismiss}
-            className="text-text-muted hover:text-text bg-bg-muted absolute right-0 flex items-center gap-1 rounded pl-2 opacity-0 group-hover:opacity-100"
+            className="absolute right-0 flex items-center gap-1 rounded bg-bg-muted pl-2 text-text-muted opacity-0 group-hover:opacity-100 hover:text-text"
         >
             <X className="size-4" />
         </button>

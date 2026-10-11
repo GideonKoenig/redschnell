@@ -52,7 +52,7 @@ const Toaster = ({ toastOptions, ...props }: ToasterProps) => {
                 warning: <AlertTriangle className="text-warning" />,
                 error: <XCircle className="text-error" />,
                 info: <Info className="text-accent" />,
-                loading: <Loader2 className="text-accent animate-spin" />,
+                loading: <Loader2 className="animate-spin text-accent" />,
             }}
             toastOptions={mergedToastOptions}
             {...props}

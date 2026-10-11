@@ -55,17 +55,17 @@ export function TranscriptView(props: {
     );
     if (!parsed.success) {
         return (
-            <div className="text-text-muted space-y-4">
+            <div className="space-y-4 text-text-muted">
                 <p>Unable to parse transcript data.</p>
                 <details className="text-xs">
                     <summary className="cursor-pointer">Parse error</summary>
-                    <pre className="bg-bg-muted mt-2 overflow-auto rounded p-2">
+                    <pre className="mt-2 overflow-auto rounded bg-bg-muted p-2">
                         {JSON.stringify(parsed.error.format(), null, 2)}
                     </pre>
                 </details>
                 <details className="text-xs">
                     <summary className="cursor-pointer">Received data</summary>
-                    <pre className="bg-bg-muted mt-2 overflow-auto rounded p-2">
+                    <pre className="mt-2 overflow-auto rounded bg-bg-muted p-2">
                         {JSON.stringify(
                             props.transcript.processedContent,
                             null,
@@ -177,9 +177,9 @@ function TranscriptFooter(props: { transcript: CompletedTranscript }) {
     const { transcript } = props;
 
     return (
-        <div className="text-text-muted border-border mt-1 flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 border-t px-3 py-2 text-xs">
+        <div className="mt-1 flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 border-t border-border px-3 py-2 text-xs text-text-muted">
             <span>
-                <span className="text-text font-medium">
+                <span className="font-medium text-text">
                     {TRANSCRIPTION_MODELS[transcript.model].label}
                 </span>
             </span>

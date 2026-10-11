@@ -15,7 +15,7 @@ export function TranscriptSection(props: {
     if (props.isLoading) {
         return (
             <div className="flex w-full items-center justify-center gap-2 p-4">
-                <Loader2 className="text-accent size-5 animate-spin" />
+                <Loader2 className="size-5 animate-spin text-accent" />
                 <span className="text-text-muted">Loading transcript...</span>
             </div>
         );
@@ -23,7 +23,7 @@ export function TranscriptSection(props: {
 
     if (!props.transcript) {
         return (
-            <div className="text-text-muted flex w-full items-center justify-center p-4">
+            <div className="flex w-full items-center justify-center p-4 text-text-muted">
                 <p>No transcript available.</p>
             </div>
         );
@@ -32,7 +32,7 @@ export function TranscriptSection(props: {
     if (props.transcript.status === "processing") {
         return (
             <div className="flex w-full items-center justify-center gap-3 p-4">
-                <Loader2 className="text-accent size-5 animate-spin" />
+                <Loader2 className="size-5 animate-spin text-accent" />
                 <span className="text-text-muted">Transcribing audio...</span>
             </div>
         );
@@ -42,7 +42,7 @@ export function TranscriptSection(props: {
         return (
             <div className="flex flex-col gap-3">
                 <div className="flex items-start gap-2">
-                    <AlertCircle className="text-error mt-0.5 size-5 shrink-0" />
+                    <AlertCircle className="mt-0.5 size-5 shrink-0 text-error" />
                     <span className="text-error">{props.transcript.error}</span>
                 </div>
                 <Button

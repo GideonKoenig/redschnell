@@ -8,7 +8,7 @@ export function NavigationBar(props: { className?: string }) {
     return (
         <nav
             className={cn(
-                "border-accent flex w-full flex-row items-center border-t-4 px-2",
+                "flex w-full flex-row items-center border-t-4 border-accent px-2",
                 props.className,
             )}
         >
@@ -34,7 +34,7 @@ function NavBarLink(props: {
     return (
         <Link
             className={cn(
-                "hover:bg-bg-muted flex h-10 flex-row items-center rounded-md px-3 text-sm",
+                "flex h-10 flex-row items-center rounded-md px-3 text-sm hover:bg-bg-muted",
                 props.className,
             )}
             href={props.href}

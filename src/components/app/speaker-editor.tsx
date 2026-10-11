@@ -135,7 +135,7 @@ function SpeakerRow(props: {
                     }}
                     disabled={props.isPending}
                     autoFocus
-                    className="text-text border-border flex-1 rounded border bg-transparent px-2 py-1 text-sm outline-none"
+                    className="flex-1 rounded border border-border bg-transparent px-2 py-1 text-sm text-text outline-none"
                 />
                 <Button
                     size="icon-sm"
@@ -164,10 +164,10 @@ function SpeakerRow(props: {
     return (
         <button
             onClick={props.onStartEdit}
-            className="hover:bg-bg-muted flex w-full items-center gap-2 rounded p-1.5 text-left"
+            className="flex w-full items-center gap-2 rounded p-1.5 text-left hover:bg-bg-muted"
         >
-            <span className="text-text-muted text-xs">{props.speaker}:</span>
-            <span className="text-text flex-1 text-sm">
+            <span className="text-xs text-text-muted">{props.speaker}:</span>
+            <span className="flex-1 text-sm text-text">
                 {props.displayName}
             </span>
         </button>
