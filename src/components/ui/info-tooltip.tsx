@@ -11,7 +11,7 @@ export function InfoTooltip(props: { content: string }) {
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <Info className="text-text-muted size-3.5 cursor-help" />
+                <Info className="size-3.5 cursor-help text-text-muted" />
             </TooltipTrigger>
             <TooltipContent side="top" sideOffset={4}>
                 {props.content}

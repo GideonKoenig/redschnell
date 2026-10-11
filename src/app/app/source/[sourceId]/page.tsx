@@ -58,7 +58,7 @@ export default function SourcePage() {
     if (sourceLoading) {
         return (
             <div className="flex h-full items-center justify-center">
-                <Loader2 className="text-accent size-8 animate-spin" />
+                <Loader2 className="size-8 animate-spin text-accent" />
             </div>
         );
     }
@@ -66,8 +66,8 @@ export default function SourcePage() {
     if (!source) {
         return (
             <div className="flex h-full flex-col items-center justify-center gap-4">
-                <AlertCircle className="text-error size-12" />
-                <p className="text-text-muted text-lg">Source not found</p>
+                <AlertCircle className="size-12 text-error" />
+                <p className="text-lg text-text-muted">Source not found</p>
                 <Button variant="outline" onClick={() => router.push("/app")}>
                     Go back
                 </Button>
@@ -95,7 +95,7 @@ export default function SourcePage() {
     // 5. Return
     return (
         <div className="flex h-full flex-col">
-            <header className="border-border flex items-center gap-3 border-b p-4">
+            <header className="flex items-center gap-3 border-b border-border p-4">
                 <InlineEdit
                     ref={inlineEditRef}
                     value={source.name}
@@ -109,7 +109,7 @@ export default function SourcePage() {
                     onClick={handleDelete}
                     disabled={deleteMutation.isPending}
                 >
-                    <Trash2 className="text-error size-4" />
+                    <Trash2 className="size-4 text-error" />
                 </Button>
             </header>
 

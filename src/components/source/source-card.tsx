@@ -28,24 +28,24 @@ export function SourceCard(props: { source: SourceWithTranscript }) {
 
     const statusIndicator = (() => {
         if (isDeleting) {
-            return <Loader2 className="text-error size-3 animate-spin" />;
+            return <Loader2 className="size-3 animate-spin text-error" />;
         }
         switch (status) {
             case "completed":
                 return (
-                    <div className="border-border size-2 rounded-full border" />
+                    <div className="size-2 rounded-full border border-border" />
                 );
             case "processing":
                 return (
                     <span className="relative flex size-2">
-                        <span className="bg-accent absolute inline-flex size-full animate-ping rounded-full opacity-75" />
-                        <span className="bg-accent relative inline-flex size-2 rounded-full" />
+                        <span className="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-75" />
+                        <span className="relative inline-flex size-2 rounded-full bg-accent" />
                     </span>
                 );
             case "failed":
-                return <div className="bg-error size-2 rounded-full" />;
+                return <div className="size-2 rounded-full bg-error" />;
             default:
-                return <div className="bg-text-muted/40 size-2 rounded-full" />;
+                return <div className="size-2 rounded-full bg-text-muted/40" />;
         }
     })();
 
@@ -61,10 +61,10 @@ export function SourceCard(props: { source: SourceWithTranscript }) {
                 href={`/app/source/${props.source.id}`}
                 data-active={isActive}
                 data-deleting={isDeleting}
-                className="hover:bg-bg-muted data-[active=true]:bg-bg-muted flex items-center gap-2 rounded-md p-2 pr-8 data-[deleting=true]:opacity-50"
+                className="flex items-center gap-2 rounded-md p-2 pr-8 hover:bg-bg-muted data-[active=true]:bg-bg-muted data-[deleting=true]:opacity-50"
             >
                 {statusIndicator}
-                <span className="text-text truncate text-sm">
+                <span className="truncate text-sm text-text">
                     {props.source.name}
                 </span>
             </Link>
@@ -72,7 +72,7 @@ export function SourceCard(props: { source: SourceWithTranscript }) {
             {!isDeleting && (
                 <button
                     onClick={handleDelete}
-                    className="text-text-muted hover:text-error absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 opacity-0 group-hover:opacity-100"
+                    className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-text-muted opacity-0 group-hover:opacity-100 hover:text-error"
                 >
                     <Trash2 className="size-4" />
                 </button>

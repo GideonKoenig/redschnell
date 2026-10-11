@@ -27,7 +27,7 @@ export default async function RootLayout({
             <head>
                 <PlausibleProvider domain="redschnell.gko.gg" selfHosted />
             </head>
-            <body className="bg-bg-base text-text h-screen w-screen">
+            <body className="h-screen w-screen bg-bg-base text-text">
                 <UTNextSSRPlugin
                     routerConfig={extractRouterConfig(ourFileRouter)}
                 />

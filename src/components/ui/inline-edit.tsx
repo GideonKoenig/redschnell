@@ -70,7 +70,7 @@ export const InlineEdit = forwardRef<InlineEditRef, InlineEditProps>(
                         disabled={isPending}
                         autoFocus
                         className={cn(
-                            "text-text flex-1 bg-transparent px-2.5 outline-none disabled:opacity-50",
+                            "flex-1 bg-transparent px-2.5 text-text outline-none disabled:opacity-50",
                             inputClassName,
                         )}
                     />
@@ -100,7 +100,7 @@ export const InlineEdit = forwardRef<InlineEditRef, InlineEditProps>(
 
         return (
             <div className={cn("flex flex-1 items-center gap-2", className)}>
-                <span className={cn("text-text flex-1", inputClassName)}>
+                <span className={cn("flex-1 text-text", inputClassName)}>
                     {value}
                 </span>
                 <Button size="icon-sm" variant="ghost" onClick={startEditing}>

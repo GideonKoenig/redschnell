@@ -61,9 +61,9 @@ export function Sidebar(props: {
     const update = updateSettings.mutate;
 
     return (
-        <aside className="bg-bg-surface border-border flex h-full w-full min-w-0 flex-col rounded-lg border shadow-sm">
-            <div className="border-border flex items-center justify-between border-b p-3">
-                <h1 className="text-text text-lg font-semibold">Sources</h1>
+        <aside className="flex h-full w-full min-w-0 flex-col rounded-lg border border-border bg-bg-surface shadow-sm">
+            <div className="flex items-center justify-between border-b border-border p-3">
+                <h1 className="text-lg font-semibold text-text">Sources</h1>
                 <Button
                     size="sm"
                     variant="accent"
@@ -90,12 +90,12 @@ export function Sidebar(props: {
 
                     {isLoading && (
                         <div className="flex items-center justify-center py-4">
-                            <Loader2 className="text-text-muted size-5 animate-spin" />
+                            <Loader2 className="size-5 animate-spin text-text-muted" />
                         </div>
                     )}
 
                     {isEmpty && (
-                        <p className="text-text-muted px-2 py-4 text-center text-sm">
+                        <p className="px-2 py-4 text-center text-sm text-text-muted">
                             No sources yet. Upload a file to get started.
                         </p>
                     )}
@@ -103,14 +103,14 @@ export function Sidebar(props: {
             </ScrollArea>
 
             {settings && (
-                <div className="border-border flex flex-col gap-2 border-t px-3 py-2">
+                <div className="flex flex-col gap-2 border-t border-border px-3 py-2">
                     <div className="flex items-center gap-2">
-                        <Settings className="text-text-muted size-4" />
-                        <span className="text-text-muted text-sm font-medium">
+                        <Settings className="size-4 text-text-muted" />
+                        <span className="text-sm font-medium text-text-muted">
                             Settings
                         </span>
                         {updateSettings.isPending && (
-                            <Loader2 className="text-text-muted ml-auto size-3.5 animate-spin" />
+                            <Loader2 className="ml-auto size-3.5 animate-spin text-text-muted" />
                         )}
                     </div>
                     <SettingRow
@@ -179,7 +179,7 @@ function SettingRow(props: {
 }) {
     return (
         <div className="flex items-center justify-between pl-6">
-            <span className="text-text-muted flex items-center gap-1.5 text-sm">
+            <span className="flex items-center gap-1.5 text-sm text-text-muted">
                 {props.label}
                 <InfoTooltip content={props.description} />
             </span>

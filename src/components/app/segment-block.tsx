@@ -35,26 +35,26 @@ export function SegmentBlock(props: {
     return (
         <button
             onClick={copySegment}
-            className="hover:bg-bg-muted group relative cursor-pointer rounded-md p-2 text-left"
+            className="group relative cursor-pointer rounded-md p-2 text-left hover:bg-bg-muted"
         >
-            <div className="bg-bg-surface border-border absolute top-1 right-1 rounded border p-1 opacity-0 shadow-sm group-hover:opacity-100">
-                <Copy className="text-text-muted size-3.5" />
+            <div className="absolute top-1 right-1 rounded border border-border bg-bg-surface p-1 opacity-0 shadow-sm group-hover:opacity-100">
+                <Copy className="size-3.5 text-text-muted" />
             </div>
             <div className="flex items-start gap-2">
                 {props.showTimestamp && (
-                    <span className="text-text-muted shrink-0 font-mono text-xs leading-6">
+                    <span className="shrink-0 font-mono text-xs leading-6 text-text-muted">
                         [{formatTimestamp(props.segment.start)}]
                     </span>
                 )}
                 {props.showSpeaker && displaySpeaker && (
                     <span
-                        className="text-accent shrink-0 truncate text-right text-sm leading-6 font-medium"
+                        className="shrink-0 truncate text-right text-sm leading-6 font-medium text-accent"
                         style={{ width: `${props.speakerWidth + 1}ch` }}
                     >
                         {`${displaySpeaker}:`}
                     </span>
                 )}
-                <span className="text-text text-sm leading-6">
+                <span className="text-sm leading-6 text-text">
                     {props.segment.text}
                 </span>
             </div>
