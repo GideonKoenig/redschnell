@@ -94,11 +94,10 @@ export function newError(error: unknown): TryCatchError {
             details.push(JSON.stringify(error.body));
         }
         if ("status" in error) {
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- Upstream status values use JavaScript string coercion.
-            details.push(`Status: ${error.status}`);
+            details.push(`Status: ${String(error.status)}`);
         }
-        if ("cause" in error && error.cause) {
-            // eslint-disable-next-line @typescript-eslint/no-base-to-string -- Arbitrary causes use their string representation.
+        if (error.cause) {
+            // eslint-disable-next-line @typescript-eslint/no-base-to-string -- causes can be any value; String() keeps Error, URL and string causes readable
             details.push(`Cause: ${String(error.cause)}`);
         }
 

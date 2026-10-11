@@ -23,7 +23,7 @@ export const transcriptsRouter = createTRPCRouter({
                 where: eq(sources.id, input.sourceId),
             });
 
-            if (!source || source.owner !== ctx.session.user.id) {
+            if (source?.owner !== ctx.session.user.id) {
                 return null;
             }
 
@@ -94,7 +94,7 @@ export const transcriptsRouter = createTRPCRouter({
                 columns: { owner: true },
             });
 
-            if (!source || source.owner !== ctx.session.user.id) {
+            if (source?.owner !== ctx.session.user.id) {
                 return null;
             }
 
@@ -113,7 +113,7 @@ export const transcriptsRouter = createTRPCRouter({
                 where: eq(sources.id, input.sourceId),
             });
 
-            if (!source || source.owner !== ctx.session.user.id) {
+            if (source?.owner !== ctx.session.user.id) {
                 return { success: false };
             }
 
@@ -162,7 +162,7 @@ export const transcriptsRouter = createTRPCRouter({
                 columns: { owner: true },
             });
 
-            if (!source || source.owner !== ctx.session.user.id) {
+            if (source?.owner !== ctx.session.user.id) {
                 return { success: false };
             }
 
@@ -199,7 +199,7 @@ export const transcriptsRouter = createTRPCRouter({
                 columns: { owner: true },
             });
 
-            if (!source || source.owner !== ctx.session.user.id) {
+            if (source?.owner !== ctx.session.user.id) {
                 return { success: false };
             }
 

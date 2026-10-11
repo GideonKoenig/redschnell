@@ -17,7 +17,7 @@ export function useUploader() {
     const plausible = usePlausible();
     const abortControllers = useRef(new Map<string, AbortController>());
 
-    const uploadFiles = async (files: File[]) => {
+    const uploadFiles = (files: File[]) => {
         const fileUploads = files.map((file) => ({
             id: crypto.randomUUID(),
             file,

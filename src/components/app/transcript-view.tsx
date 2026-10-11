@@ -88,14 +88,14 @@ export function TranscriptView(props: {
         return Math.max(max, displayName.length);
     }, 0);
 
-    const copyAll = () => {
+    const copyAll = async () => {
         const text = formatTranscriptText(
             transcript,
             showTimestamps,
             showSpeakers,
             speakerNames,
         );
-        void navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(text);
         toast.success("Transcript copied to clipboard");
     };
 
