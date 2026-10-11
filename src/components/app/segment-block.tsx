@@ -18,7 +18,7 @@ export function SegmentBlock(props: {
         ? (props.speakerNames[props.segment.speaker] ?? props.segment.speaker)
         : null;
 
-    const copySegment = () => {
+    const copySegment = async () => {
         let text = "";
         if (props.showTimestamp) {
             text += `[${formatTimestamp(props.segment.start)}] `;
@@ -28,7 +28,7 @@ export function SegmentBlock(props: {
         }
         text += props.segment.text;
 
-        void navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(text);
         toast.success("Segment copied");
     };
 

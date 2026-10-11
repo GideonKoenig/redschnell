@@ -34,7 +34,7 @@ export const sourcesRouter = createTRPCRouter({
                 },
             });
 
-            if (!source || source.owner !== ctx.session.user.id) {
+            if (source?.owner !== ctx.session.user.id) {
                 return null;
             }
 
@@ -54,7 +54,7 @@ export const sourcesRouter = createTRPCRouter({
                 columns: { owner: true },
             });
 
-            if (!source || source.owner !== ctx.session.user.id) {
+            if (source?.owner !== ctx.session.user.id) {
                 return { success: false };
             }
 
@@ -73,7 +73,7 @@ export const sourcesRouter = createTRPCRouter({
                 where: eq(sources.id, input.id),
             });
 
-            if (!source || source.owner !== ctx.session.user.id) {
+            if (source?.owner !== ctx.session.user.id) {
                 return { success: false };
             }
 
