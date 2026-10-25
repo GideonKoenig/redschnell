@@ -5,6 +5,10 @@
   ],
   "deploy": {
     "aptPackages": [
+      "...",
+      "ca-certificates",
+      "curl",
+      "wget",
       "ffmpeg"
     ]
   }
