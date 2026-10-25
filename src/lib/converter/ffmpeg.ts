@@ -70,7 +70,7 @@ async function processQueue() {
     }
 
     isProcessing = false;
-    processQueue();
+    void processQueue();
 }
 
 export function queueConversion<T>(
@@ -86,7 +86,7 @@ export function queueConversion<T>(
             reject,
             onStart,
         } as QueueItem<unknown>);
-        processQueue();
+        void processQueue();
     });
 }
 

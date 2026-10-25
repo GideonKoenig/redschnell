@@ -40,7 +40,7 @@ export function TranscriptView(props: {
 
     const reprocessMutation = api.transcripts.reprocess.useMutation({
         onSuccess: () => {
-            utils.transcripts.get.invalidate({
+            void utils.transcripts.get.invalidate({
                 sourceId: props.transcript.sourceId,
             });
             toast.success("Transcript reprocessed");
@@ -95,7 +95,7 @@ export function TranscriptView(props: {
             showSpeakers,
             speakerNames,
         );
-        navigator.clipboard.writeText(text);
+        void navigator.clipboard.writeText(text);
         toast.success("Transcript copied to clipboard");
     };
 

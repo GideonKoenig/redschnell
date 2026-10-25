@@ -76,20 +76,20 @@ export const transcribeDeepgram: TranscribeFunction = async (
             const speaker =
                 word.speaker !== undefined ? `Speaker ${word.speaker}` : null;
 
-            if (!currentChunk || currentChunk.speaker !== speaker) {
-                if (currentChunk) {
-                    chunks.push(currentChunk);
+            if (currentChunk) {
+                if (currentChunk.speaker === speaker) {
+                    currentChunk.end = word.end;
+                    currentChunk.text += " " + (word.punctuated_word ?? word.word);
+                    continue;
                 }
-                currentChunk = {
-                    start: word.start,
-                    end: word.end,
-                    text: word.punctuated_word ?? word.word,
-                    speaker,
-                };
-            } else {
-                currentChunk.end = word.end;
-                currentChunk.text += " " + (word.punctuated_word ?? word.word);
+                chunks.push(currentChunk);
             }
+            currentChunk = {
+                start: word.start,
+                end: word.end,
+                text: word.punctuated_word ?? word.word,
+                speaker,
+            };
         }
 
         if (currentChunk) {

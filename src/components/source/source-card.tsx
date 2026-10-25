@@ -14,7 +14,7 @@ export function SourceCard(props: { source: SourceWithTranscript }) {
 
     const deleteMutation = api.sources.delete.useMutation({
         onSuccess: () => {
-            utils.sources.list.invalidate();
+            void utils.sources.list.invalidate();
             if (pathname === `/app/source/${props.source.id}`) {
                 router.push("/app");
             }

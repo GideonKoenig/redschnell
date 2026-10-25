@@ -22,6 +22,7 @@ export const auth = betterAuth({
             role: {
                 type: "string",
                 defaultValue: "free",
+                input: false,
             },
             autoTranscribe: {
                 type: "boolean",

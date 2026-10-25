@@ -26,7 +26,7 @@ export function SpeakerEditor(props: SpeakerEditorProps) {
     const utils = api.useUtils();
     const updateMutation = api.transcripts.updateSpeakerNames.useMutation({
         onSuccess: () => {
-            utils.transcripts.get.invalidate({ sourceId: props.sourceId });
+            void utils.transcripts.get.invalidate({ sourceId: props.sourceId });
             setEditingSpeaker(null);
             toast.success("Speaker name updated");
         },

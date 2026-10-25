@@ -10,6 +10,8 @@ function Progress({
     value,
     ...props
 }: React.ComponentProps<typeof ProgressPrimitive.Root>) {
+    const progress = Number.isNaN(value) ? 0 : (value ?? 0);
+
     return (
         <ProgressPrimitive.Root
             data-slot="progress"
@@ -22,7 +24,7 @@ function Progress({
             <ProgressPrimitive.Indicator
                 data-slot="progress-indicator"
                 className="bg-accent h-full w-full flex-1 transition-all"
-                style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+                style={{ transform: `translateX(-${100 - progress}%)` }}
             />
         </ProgressPrimitive.Root>
     );

@@ -13,13 +13,15 @@ export function AppShell(props: { children: ReactNode }) {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleDrop = (e: React.DragEvent) => {
-        onDrop(e, uploadFiles);
+        onDrop(e, (files) => {
+            void uploadFiles(files);
+        });
     };
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files ?? []);
         if (files.length > 0) {
-            uploadFiles(files);
+            void uploadFiles(files);
         }
         if (fileInputRef.current) {
             fileInputRef.current.value = "";

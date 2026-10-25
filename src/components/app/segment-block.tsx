@@ -28,7 +28,7 @@ export function SegmentBlock(props: {
         }
         text += props.segment.text;
 
-        navigator.clipboard.writeText(text);
+        void navigator.clipboard.writeText(text);
         toast.success("Segment copied");
     };
 

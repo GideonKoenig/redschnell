@@ -25,7 +25,7 @@ export function useUploader() {
 
         for (const { id, file } of fileUploads) {
             addUpload(id, file.name);
-            processAndUpload(id, file);
+            void processAndUpload(id, file);
         }
     };
 

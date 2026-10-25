@@ -47,7 +47,7 @@ export function Sidebar(props: {
             }
         },
         onSettled: () => {
-            utils.settings.get.invalidate();
+            void utils.settings.get.invalidate();
         },
     });
 

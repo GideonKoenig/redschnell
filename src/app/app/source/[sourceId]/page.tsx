@@ -32,15 +32,15 @@ export default function SourcePage() {
 
     const renameMutation = api.sources.rename.useMutation({
         onSuccess: () => {
-            utils.sources.get.invalidate({ id: sourceId });
-            utils.sources.list.invalidate();
+            void utils.sources.get.invalidate({ id: sourceId });
+            void utils.sources.list.invalidate();
             inlineEditRef.current?.close();
         },
     });
 
     const deleteMutation = api.sources.delete.useMutation({
         onSuccess: () => {
-            utils.sources.list.invalidate();
+            void utils.sources.list.invalidate();
             router.push("/app");
             toast.success("Source deleted");
         },
@@ -48,9 +48,9 @@ export default function SourcePage() {
 
     const retryMutation = api.transcripts.retry.useMutation({
         onSuccess: () => {
-            utils.transcripts.get.invalidate({ sourceId });
-            utils.sources.get.invalidate({ id: sourceId });
-            utils.sources.list.invalidate();
+            void utils.transcripts.get.invalidate({ sourceId });
+            void utils.sources.get.invalidate({ id: sourceId });
+            void utils.sources.list.invalidate();
         },
     });
 
