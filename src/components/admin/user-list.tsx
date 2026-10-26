@@ -3,6 +3,7 @@
 import { Loader2, Search } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { BackLink } from "~/components/app/back-link";
 import { UserAvatar } from "~/components/auth/user-avatar";
 import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
@@ -37,6 +38,7 @@ export function UserList() {
     return (
         <div className="flex h-full flex-col">
             <header className="flex items-center gap-3 border-b border-border p-4">
+                <BackLink />
                 <h2 className="text-lg font-semibold text-text">Users</h2>
                 <label className="ml-auto flex h-8 w-64 min-w-0 items-center gap-2 rounded-md border border-border px-2 focus-within:ring-[3px] focus-within:ring-accent/50">
                     <Search className="size-4 shrink-0 text-text-muted" />

@@ -11,6 +11,7 @@ import { InfoTooltip } from "~/components/ui/info-tooltip";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Switch } from "~/components/ui/switch";
 import { type User } from "~/lib/auth-server";
+import { cn } from "~/lib/utils";
 import { api } from "~/trpc/react";
 
 export function Sidebar(props: {
@@ -18,6 +19,7 @@ export function Sidebar(props: {
     surrogate: boolean;
     onUploadClick: () => void;
     onCancelUpload: (id: string) => void;
+    className?: string;
 }) {
     const { uploads } = useUploadProgress();
     const { data: sources, isLoading } = api.sources.list.useQuery(undefined, {
@@ -61,7 +63,12 @@ export function Sidebar(props: {
     const update = updateSettings.mutate;
 
     return (
-        <aside className="flex h-full w-full min-w-0 flex-col rounded-lg border border-border bg-bg-surface shadow-sm">
+        <aside
+            className={cn(
+                "flex h-full w-full min-w-0 flex-col rounded-lg border border-border bg-bg-surface shadow-sm",
+                props.className,
+            )}
+        >
             <div className="flex items-center justify-between border-b border-border p-3">
                 <h1 className="text-lg font-semibold text-text">Sources</h1>
                 <Button
@@ -178,10 +185,18 @@ function SettingRow(props: {
     children: React.ReactNode;
 }) {
     return (
-        <div className="flex items-center justify-between pl-6">
-            <span className="flex items-center gap-1.5 text-sm text-text-muted">
-                {props.label}
-                <InfoTooltip content={props.description} />
+        <div className="flex items-center justify-between gap-3 pl-6">
+            {/* Touch screens can't hover, so they show the description inline instead of in a tooltip. */}
+            <span className="flex flex-col text-sm text-text-muted">
+                <span className="flex items-center gap-1.5">
+                    {props.label}
+                    <span className="pointer-coarse:hidden">
+                        <InfoTooltip content={props.description} />
+                    </span>
+                </span>
+                <span className="hidden text-xs pointer-coarse:block">
+                    {props.description}
+                </span>
             </span>
             {props.children}
         </div>

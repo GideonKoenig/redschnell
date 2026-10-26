@@ -40,7 +40,8 @@ export function SegmentBlock(props: {
             <div className="absolute top-1 right-1 rounded border border-border bg-bg-surface p-1 opacity-0 shadow-sm group-hover:opacity-100">
                 <Copy className="size-3.5 text-text-muted" />
             </div>
-            <div className="flex items-start gap-2">
+            {/* Phones stack timestamp and speaker above the text; wider screens align them in columns. */}
+            <div className="flex flex-wrap items-start gap-x-2 md:flex-nowrap">
                 {props.showTimestamp && (
                     <span className="shrink-0 font-mono text-xs leading-6 text-text-muted">
                         [{formatTimestamp(props.segment.start)}]
@@ -48,13 +49,13 @@ export function SegmentBlock(props: {
                 )}
                 {props.showSpeaker && displaySpeaker && (
                     <span
-                        className="shrink-0 truncate text-right text-sm leading-6 font-medium text-accent"
+                        className="shrink-0 truncate text-sm leading-6 font-medium text-accent max-md:w-auto! md:text-right"
                         style={{ width: `${props.speakerWidth + 1}ch` }}
                     >
                         {`${displaySpeaker}:`}
                     </span>
                 )}
-                <span className="text-sm leading-6 text-text">
+                <span className="basis-full text-sm leading-6 text-text md:basis-auto">
                     {props.segment.text}
                 </span>
             </div>

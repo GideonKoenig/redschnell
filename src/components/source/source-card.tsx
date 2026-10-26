@@ -69,10 +69,11 @@ export function SourceCard(props: { source: SourceWithTranscript }) {
                 </span>
             </Link>
 
+            {/* Hover-only, so touch screens delete from the source page instead. */}
             {!isDeleting && (
                 <button
                     onClick={handleDelete}
-                    className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-text-muted opacity-0 group-hover:opacity-100 hover:text-error"
+                    className="absolute top-1/2 right-2 hidden -translate-y-1/2 rounded p-1 text-text-muted opacity-0 group-hover:opacity-100 hover:text-error pointer-fine:block"
                 >
                     <Trash2 className="size-4" />
                 </button>

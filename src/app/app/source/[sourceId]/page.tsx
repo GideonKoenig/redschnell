@@ -3,6 +3,7 @@
 import { AlertCircle, Loader2, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { BackLink } from "~/components/app/back-link";
 import { TranscriptSection } from "~/components/app/transcript-section";
 import { Button } from "~/components/ui/button";
 import { InlineEdit, useInlineEdit } from "~/components/ui/inline-edit";
@@ -96,6 +97,7 @@ export default function SourcePage() {
     return (
         <div className="flex h-full flex-col">
             <header className="flex items-center gap-3 border-b border-border p-4">
+                <BackLink />
                 <InlineEdit
                     ref={inlineEditRef}
                     value={source.name}
