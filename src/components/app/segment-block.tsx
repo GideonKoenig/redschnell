@@ -13,6 +13,8 @@ export function SegmentBlock(props: {
     showSpeaker: boolean;
     speakerNames: Record<string, string>;
     speakerWidth: number;
+    isActive: boolean;
+    onSeek: () => void;
 }) {
     const displaySpeaker = props.segment.speaker
         ? (props.speakerNames[props.segment.speaker] ?? props.segment.speaker)
@@ -32,20 +34,30 @@ export function SegmentBlock(props: {
         toast.success("Segment copied");
     };
 
+    // The copy button covers the whole row. The content above it ignores the pointer, except the timestamp, which seeks.
     return (
-        <button
-            onClick={copySegment}
-            className="group relative cursor-pointer rounded-md p-2 text-left hover:bg-bg-muted"
+        <div
+            data-active={props.isActive}
+            className="group relative rounded-md p-2 hover:bg-bg-muted data-[active=true]:bg-accent/10"
         >
-            <div className="absolute top-1 right-1 rounded border border-border bg-bg-surface p-1 opacity-0 shadow-sm group-hover:opacity-100">
+            <button
+                onClick={copySegment}
+                aria-label="Copy segment"
+                className="absolute inset-0 cursor-pointer rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-accent/50"
+            />
+            <div className="pointer-events-none absolute top-1 right-1 rounded border border-border bg-bg-surface p-1 opacity-0 shadow-sm group-hover:opacity-100">
                 <Copy className="size-3.5 text-text-muted" />
             </div>
             {/* Phones stack timestamp and speaker above the text; wider screens align them in columns. */}
-            <div className="flex flex-wrap items-start gap-x-2 md:flex-nowrap">
+            <div className="pointer-events-none relative flex flex-wrap items-start gap-x-2 md:flex-nowrap">
                 {props.showTimestamp && (
-                    <span className="shrink-0 font-mono text-xs leading-6 text-text-muted">
+                    <button
+                        onClick={props.onSeek}
+                        title="Play from here"
+                        className="pointer-events-auto shrink-0 cursor-pointer rounded font-mono text-xs leading-6 text-text-muted outline-none hover:text-accent focus-visible:ring-[3px] focus-visible:ring-accent/50"
+                    >
                         [{formatTimestamp(props.segment.start)}]
-                    </span>
+                    </button>
                 )}
                 {props.showSpeaker && displaySpeaker && (
                     <span
@@ -59,6 +71,6 @@ export function SegmentBlock(props: {
                     {props.segment.text}
                 </span>
             </div>
-        </button>
+        </div>
     );
 }

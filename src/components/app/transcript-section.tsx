@@ -65,6 +65,8 @@ export function TranscriptSection(props: {
     if (props.transcript.status === "completed") {
         return (
             <TranscriptView
+                // Remount per source so playback never carries over to another recording.
+                key={props.sourceId}
                 transcript={props.transcript}
                 onRetry={props.onRetry}
                 isRetrying={props.isRetrying}
