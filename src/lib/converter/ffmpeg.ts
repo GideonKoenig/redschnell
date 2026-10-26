@@ -12,6 +12,7 @@ export async function getFFmpeg() {
     loadPromise = (async () => {
         const instance = new FFmpeg();
 
+        // Copied from @ffmpeg/core-mt 0.12.10. The multithreaded core needs the COOP/COEP headers in next.config.js.
         await instance.load({
             coreURL: "/ffmpeg/ffmpeg-core.js",
             wasmURL: "/ffmpeg/ffmpeg-core.wasm",
