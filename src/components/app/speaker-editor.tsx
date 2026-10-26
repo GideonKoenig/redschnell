@@ -1,175 +1,94 @@
 "use client";
 
-import { Check, ChevronDown, Loader2, User, X } from "lucide-react";
+import { ChevronRight, Loader2, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "~/components/ui/popover";
 import { cn } from "~/lib/utils";
 import { api } from "~/trpc/react";
 
-type SpeakerEditorProps = {
+/** Renames all detected speakers in one form. An empty field resets the speaker to its detected label. */
+export function SpeakerEditor(props: {
     sourceId: string;
     speakers: string[];
     speakerNames: Record<string, string>;
-};
-
-export function SpeakerEditor(props: SpeakerEditorProps) {
+}) {
     const [isOpen, setIsOpen] = useState(false);
-    const [editingSpeaker, setEditingSpeaker] = useState<string | null>(null);
-    const [editValue, setEditValue] = useState("");
 
     const utils = api.useUtils();
-    const updateMutation = api.transcripts.updateSpeakerNames.useMutation({
-        onSuccess: () => {
-            void utils.transcripts.get.invalidate({ sourceId: props.sourceId });
-            setEditingSpeaker(null);
-            toast.success("Speaker name updated");
+    const update = api.transcripts.updateSpeakerNames.useMutation({
+        onSuccess: async () => {
+            await utils.transcripts.get.invalidate({
+                sourceId: props.sourceId,
+            });
+            setIsOpen(false);
         },
         onError: () => {
-            toast.error("Failed to update speaker name");
+            toast.error("Failed to update speaker names");
         },
     });
 
-    const startEditing = (speaker: string) => {
-        setEditValue(props.speakerNames[speaker] ?? speaker);
-        setEditingSpeaker(speaker);
-    };
-
-    const save = () => {
-        if (!editingSpeaker) return;
-
-        const trimmed = editValue.trim();
-        if (!trimmed) {
-            setEditingSpeaker(null);
-            return;
-        }
-
-        const newNames = { ...props.speakerNames };
-        if (trimmed === editingSpeaker) {
-            delete newNames[editingSpeaker];
-        } else {
-            newNames[editingSpeaker] = trimmed;
-        }
-
-        updateMutation.mutate({
-            sourceId: props.sourceId,
-            speakerNames: newNames,
+    const save = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const form = new FormData(event.currentTarget);
+        const entries = props.speakers.map((speaker) => {
+            const value = form.get(speaker);
+            const name = typeof value === "string" ? value.trim() : "";
+            return [speaker, name] as const;
         });
-    };
-
-    const cancel = () => {
-        setEditingSpeaker(null);
-    };
-
-    if (props.speakers.length === 0) {
-        return null;
-    }
-
-    return (
-        <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-            <DropdownMenuTrigger asChild>
-                <Button size="sm" variant={isOpen ? "secondary" : "ghost"}>
-                    <User className="size-4" />
-                    Rename Speakers
-                    <ChevronDown
-                        className={cn(
-                            "size-4 transition-transform",
-                            isOpen && "rotate-180",
-                        )}
-                    />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-                align="start"
-                className="w-72 p-2"
-                onCloseAutoFocus={(e) => e.preventDefault()}
-            >
-                <div className="flex flex-col gap-1">
-                    {props.speakers.map((speaker) => (
-                        <SpeakerRow
-                            key={speaker}
-                            speaker={speaker}
-                            displayName={props.speakerNames[speaker] ?? speaker}
-                            isEditing={editingSpeaker === speaker}
-                            editValue={editValue}
-                            isPending={updateMutation.isPending}
-                            onStartEdit={() => startEditing(speaker)}
-                            onEditChange={setEditValue}
-                            onSave={save}
-                            onCancel={cancel}
-                        />
-                    ))}
-                </div>
-            </DropdownMenuContent>
-        </DropdownMenu>
-    );
-}
-
-function SpeakerRow(props: {
-    speaker: string;
-    displayName: string;
-    isEditing: boolean;
-    editValue: string;
-    isPending: boolean;
-    onStartEdit: () => void;
-    onEditChange: (value: string) => void;
-    onSave: () => void;
-    onCancel: () => void;
-}) {
-    if (props.isEditing) {
-        return (
-            <div className="flex items-center gap-1 rounded p-1">
-                <input
-                    type="text"
-                    value={props.editValue}
-                    onChange={(e) => props.onEditChange(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (props.isPending) return;
-                        if (e.key === "Enter") props.onSave();
-                        if (e.key === "Escape") props.onCancel();
-                    }}
-                    disabled={props.isPending}
-                    autoFocus
-                    className="flex-1 rounded border border-border bg-transparent px-2 py-1 text-sm text-text outline-none"
-                />
-                <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    onClick={props.onSave}
-                    disabled={props.isPending}
-                >
-                    {props.isPending ? (
-                        <Loader2 className="size-3.5 animate-spin" />
-                    ) : (
-                        <Check className="size-3.5" />
-                    )}
-                </Button>
-                <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    onClick={props.onCancel}
-                    disabled={props.isPending}
-                >
-                    <X className="size-3.5" />
-                </Button>
-            </div>
+        const speakerNames = Object.fromEntries(
+            entries.filter(([speaker, name]) => name && name !== speaker),
         );
-    }
+        update.mutate({ sourceId: props.sourceId, speakerNames });
+    };
 
     return (
-        <button
-            onClick={props.onStartEdit}
-            className="flex w-full items-center gap-2 rounded p-1.5 text-left hover:bg-bg-muted"
-        >
-            <span className="text-xs text-text-muted">{props.speaker}:</span>
-            <span className="flex-1 text-sm text-text">
-                {props.displayName}
-            </span>
-        </button>
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+            <PopoverTrigger asChild>
+                <Button size="sm" variant={isOpen ? "secondary" : "ghost"}>
+                    <Users />
+                    Speakers
+                    {/* No rotation transition: animating the icon makes Chrome re-rasterize the label, so the text flickers. */}
+                    <ChevronRight className={cn(isOpen && "rotate-90")} />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-80">
+                <form onSubmit={save} className="flex flex-col gap-3">
+                    <div className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2">
+                        {props.speakers.map((speaker) => (
+                            <label key={speaker} className="contents">
+                                <span className="text-xs text-text-muted">
+                                    {speaker}
+                                </span>
+                                <input
+                                    name={speaker}
+                                    defaultValue={props.speakerNames[speaker]}
+                                    placeholder={speaker}
+                                    disabled={update.isPending}
+                                    className="h-8 min-w-0 rounded-md border border-border bg-transparent px-2 text-sm text-text outline-none placeholder:text-text-muted focus-visible:ring-[3px] focus-visible:ring-accent/50 disabled:opacity-50"
+                                />
+                            </label>
+                        ))}
+                    </div>
+                    <Button
+                        type="submit"
+                        size="sm"
+                        variant="accent"
+                        disabled={update.isPending}
+                        className="self-end"
+                    >
+                        {update.isPending && (
+                            <Loader2 className="animate-spin" />
+                        )}
+                        Save
+                    </Button>
+                </form>
+            </PopoverContent>
+        </Popover>
     );
 }
