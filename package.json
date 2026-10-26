@@ -7,12 +7,12 @@
         "build": "cross-env NODE_OPTIONS=--no-deprecation next build --webpack",
         "postbuild": "next-sitemap",
         "db:generate": "drizzle-kit generate",
-        "db:migrate": "drizzle-kit migrate",
+        "db:migrate": "node --env-file-if-exists=.env scripts/migrate.mjs",
         "db:push": "drizzle-kit push",
         "db:studio": "drizzle-kit studio",
         "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --webpack",
         "lint": "eslint .",
-        "start": "cross-env NODE_OPTIONS=--no-deprecation next start"
+        "start": "pnpm db:migrate && cross-env NODE_OPTIONS=--no-deprecation next start"
     },
     "dependencies": {
         "@deepgram/sdk": "^5.14.0",
