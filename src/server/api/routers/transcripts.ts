@@ -36,6 +36,7 @@ export const transcriptsRouter = createTRPCRouter({
                     ...existing,
                     status: "completed" as const,
                     source: {
+                        url: source.url,
                         duration: source.duration,
                         fileSize: source.fileSize,
                     },

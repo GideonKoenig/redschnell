@@ -4,10 +4,13 @@ import {
     Copy,
     Loader2,
     MoreHorizontal,
+    Play,
     RefreshCw,
     RotateCcw,
 } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
+import { AudioPlayerBar } from "~/components/app/audio-player";
 import { SegmentBlock } from "~/components/app/segment-block";
 import { SpeakerEditor } from "~/components/app/speaker-editor";
 import { Button } from "~/components/ui/button";
@@ -18,6 +21,7 @@ import {
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { ScrollArea } from "~/components/ui/scroll-area";
+import { useAudioPlayer } from "~/hooks/use-audio-player";
 import {
     formatDuration,
     formatFileSize,
@@ -37,6 +41,9 @@ export function TranscriptView(props: {
 }) {
     const utils = api.useUtils();
     const { data: settings = DEFAULT_SETTINGS } = api.settings.get.useQuery();
+    const player = useAudioPlayer(props.transcript.source.url);
+    const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+    const [playingIndex, setPlayingIndex] = useState(-1);
 
     const reprocessMutation = api.transcripts.reprocess.useMutation({
         onSuccess: () => {
@@ -88,6 +95,29 @@ export function TranscriptView(props: {
         return Math.max(max, displayName.length);
     }, 0);
 
+    const activeIndex = isPlayerOpen ? playingIndex : -1;
+
+    // Tracks the segment being heard: the last one that started at or before the playback position. Segments are in order.
+    // Setting the same index again doesn't re-render, so the transcript only re-renders when the segment changes.
+    const trackSegment = (event: React.SyntheticEvent<HTMLAudioElement>) => {
+        const time = event.currentTarget.currentTime;
+        setPlayingIndex(
+            transcript.segments.filter((segment) => segment.start <= time)
+                .length - 1,
+        );
+    };
+
+    const playFrom = (time: number) => {
+        setIsPlayerOpen(true);
+        player.seek(time);
+        player.play();
+    };
+
+    const closePlayer = () => {
+        player.pause();
+        setIsPlayerOpen(false);
+    };
+
     const copyAll = async () => {
         const text = formatTranscriptText(
             transcript,
@@ -110,9 +140,22 @@ export function TranscriptView(props: {
                     />
                 )}
                 <div className="flex-1" />
+                {!isPlayerOpen && (
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                            setIsPlayerOpen(true);
+                            player.play();
+                        }}
+                    >
+                        <Play />
+                        <span className="max-md:sr-only">Play</span>
+                    </Button>
+                )}
                 <Button size="sm" variant="outline" onClick={copyAll}>
                     <Copy className="size-4" />
-                    Copy all
+                    <span className="max-md:sr-only">Copy all</span>
                 </Button>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -154,7 +197,7 @@ export function TranscriptView(props: {
             <div className="min-h-0 grow pl-3">
                 <ScrollArea className="h-full">
                     <div className="flex flex-col gap-1 pr-3">
-                        {transcript.segments.map((segment) => (
+                        {transcript.segments.map((segment, index) => (
                             <SegmentBlock
                                 key={segment.id}
                                 segment={segment}
@@ -162,11 +205,23 @@ export function TranscriptView(props: {
                                 showSpeaker={showSpeakers}
                                 speakerNames={speakerNames}
                                 speakerWidth={maxSpeakerWidth}
+                                isActive={index === activeIndex}
+                                onSeek={() => playFrom(segment.start)}
                             />
                         ))}
                     </div>
                 </ScrollArea>
             </div>
+
+            {/* Hidden element; the bar renders the controls. */}
+            <audio {...player.audioProps} onTimeUpdate={trackSegment} />
+            {isPlayerOpen && (
+                <AudioPlayerBar
+                    player={player}
+                    fallbackDuration={props.transcript.source.duration}
+                    onClose={closePlayer}
+                />
+            )}
 
             <TranscriptFooter transcript={props.transcript} />
         </div>
