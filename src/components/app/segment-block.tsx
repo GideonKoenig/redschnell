@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy } from "lucide-react";
+import { Copy, Play } from "lucide-react";
 import { toast } from "sonner";
 import {
     formatTimestamp,
@@ -14,6 +14,8 @@ export function SegmentBlock(props: {
     speakerNames: Record<string, string>;
     speakerWidth: number;
     isActive: boolean;
+    /** True while the player is open: clicking the row then plays from it instead of copying it. */
+    seeksOnClick: boolean;
     onSeek: () => void;
 }) {
     const displaySpeaker = props.segment.speaker
@@ -34,19 +36,25 @@ export function SegmentBlock(props: {
         toast.success("Segment copied");
     };
 
-    // The copy button covers the whole row. The content above it ignores the pointer, except the timestamp, which seeks.
+    // The row button covers the whole row. The content above it ignores the pointer, except the timestamp, which always seeks.
     return (
         <div
             data-active={props.isActive}
             className="group relative rounded-md p-2 hover:bg-bg-muted data-[active=true]:bg-accent/10"
         >
             <button
-                onClick={copySegment}
-                aria-label="Copy segment"
+                onClick={props.seeksOnClick ? props.onSeek : copySegment}
+                aria-label={
+                    props.seeksOnClick ? "Play from here" : "Copy segment"
+                }
                 className="absolute inset-0 cursor-pointer rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-accent/50"
             />
             <div className="pointer-events-none absolute top-1 right-1 rounded border border-border bg-bg-surface p-1 opacity-0 shadow-sm group-hover:opacity-100">
-                <Copy className="size-3.5 text-text-muted" />
+                {props.seeksOnClick ? (
+                    <Play className="size-3.5 text-text-muted" />
+                ) : (
+                    <Copy className="size-3.5 text-text-muted" />
+                )}
             </div>
             {/* Phones stack timestamp and speaker above the text; wider screens align them in columns. */}
             <div className="pointer-events-none relative flex flex-wrap items-start gap-x-2 md:flex-nowrap">
