@@ -206,6 +206,7 @@ export function TranscriptView(props: {
                                 speakerNames={speakerNames}
                                 speakerWidth={maxSpeakerWidth}
                                 isActive={index === activeIndex}
+                                seeksOnClick={isPlayerOpen}
                                 onSeek={() => playFrom(segment.start)}
                             />
                         ))}
